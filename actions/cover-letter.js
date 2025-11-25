@@ -10,28 +10,28 @@ const model = genAI.getGenerativeModel({ model:"gemini-2.5-flash" });
 
 
 
-export async function updateCoverLetterOrder(orderedCoverLetters) {
-  const { userId: clerkUserId } = await auth();
-  if (!clerkUserId) throw new Error("Unauthorized");
+// export async function updateCoverLetterOrder(orderedCoverLetters) {
+//   const { userId: clerkUserId } = await auth();
+//   if (!clerkUserId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId },
-  });
-  if (!user) throw new Error("User not found");
+//   const user = await db.user.findUnique({
+//     where: { clerkUserId },
+//   });
+//   if (!user) throw new Error("User not found");
 
-  console.log("Updating order for user:", user.id);
-  console.log("Payload:", orderedCoverLetters);
+//   console.log("Updating order for user:", user.id);
+//   console.log("Payload:", orderedCoverLetters);
 
-  const ops = orderedCoverLetters.map(({ id, order }) =>
-    db.coverLetter.updateMany({
-      where: { id, userId: user.id }, 
-      data: { order },
-    })
-  );
+//   const ops = orderedCoverLetters.map(({ id, order }) =>
+//     db.coverLetter.updateMany({
+//       where: { id, userId: user.id }, 
+//       data: { order },
+//     })
+//   );
 
-  await db.$transaction(ops);
-  return { success: true };
-}
+//   await db.$transaction(ops);
+//   return { success: true };
+// }
 
 
 export async function generateCoverLetter(data) {
