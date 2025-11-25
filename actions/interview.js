@@ -1,11 +1,5 @@
 "use server";
 
-export const config = {
-  runtime: "nodejs",
-  maxDuration: 300, // 5 minutes
-};
-
-
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
