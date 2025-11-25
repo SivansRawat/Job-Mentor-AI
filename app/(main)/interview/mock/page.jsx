@@ -1,5 +1,5 @@
 export const runtime = "nodejs";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
