@@ -31,23 +31,49 @@ export default function ResumeBuilder({ initialContent }) {
   const { user } = useUser();
   const [resumeMode, setResumeMode] = useState("preview");
 
+  // const {
+  //   control,
+  //   register,
+  //   handleSubmit,
+  //   watch,
+  //   formState: { errors },
+  // } = useForm({
+  //   resolver: zodResolver(resumeSchema),
+  //   defaultValues: {
+  //     contactInfo: {},
+  //     summary: "",
+  //     skills: "",
+  //     experience: [],
+  //     education: [],
+  //     projects: [],
+  //   },
+  // });
+
+
+
+
   const {
-    control,
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(resumeSchema),
-    defaultValues: {
-      contactInfo: {},
-      summary: "",
-      skills: "",
-      experience: [],
-      education: [],
-      projects: [],
-    },
-  });
+  control,
+  register,
+  handleSubmit,
+  watch,
+  formState: { errors },
+} = useForm({
+  resolver: zodResolver(resumeSchema),
+  mode: "onChange", // 👈 validates in real-time as user types
+  reValidateMode: "onChange", // 👈 revalidates when input changes
+  defaultValues: {
+    contactInfo: {},
+    summary: "",
+    skills: "",
+    experience: [],
+    education: [],
+    projects: [],
+  },
+});
+
+
+
 
   const {
     loading: isSaving,
