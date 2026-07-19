@@ -39,15 +39,15 @@ function chunkText(text, size = 800, overlap = 150) {
 }
 
 export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!user) throw new Error("User not found");
-
   try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!user) return { success: false, error: "User not found" };
+
     let rawText = "";
 
     // 1. Parse content based on file type
@@ -61,7 +61,7 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
     }
 
     if (!rawText.trim()) {
-      throw new Error("Could not extract any content from the document.");
+      return { success: false, error: "Could not extract any content from the document." };
     }
 
     // 2. Split document into overlapping chunks
@@ -92,40 +92,40 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
     };
   } catch (error) {
     console.error("Error processing document RAG embeddings:", error);
-    throw new Error(error.message || "Failed to embed document.");
+    return { success: false, error: error.message || "Failed to embed document." };
   }
 }
 
 export async function clearAllDocuments() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!user) throw new Error("User not found");
-
   try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!user) return { success: false, error: "User not found" };
+
     await db.documentChunk.deleteMany({
       where: { userId: user.id },
     });
     return { success: true };
   } catch (error) {
     console.error("Error deleting chunks:", error);
-    throw new Error("Failed to clear documents.");
+    return { success: false, error: error.message || "Failed to clear documents." };
   }
 }
 
 export async function chatAdvisor(userMessage, chatHistory = []) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!user) throw new Error("User not found");
-
   try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!user) return { success: false, error: "User not found" };
+
     // 1. Generate vector embedding for the user message
     const embedResult = await embeddingModel.embedContent({
       content: { parts: [{ text: userMessage }] },
@@ -135,7 +135,6 @@ export async function chatAdvisor(userMessage, chatHistory = []) {
     const queryVectorString = `[${queryVector.join(",")}]`;
 
     // 2. Perform Cosine Similarity vector search on PostgreSQL pgvector column
-    // order by distance ascending (meaning cosine similarity descending)
     const matches = await db.$queryRawUnsafe(`
       SELECT content, metadata, 1 - (embedding <=> $1::vector) AS similarity
       FROM "DocumentChunk"
@@ -194,6 +193,6 @@ export async function chatAdvisor(userMessage, chatHistory = []) {
     };
   } catch (error) {
     console.error("AI Advisor chat crash:", error);
-    throw new Error("Failed to process message. Please check that your documents are embedded correctly.");
+    return { success: false, error: error.message || "Failed to process message." };
   }
 }

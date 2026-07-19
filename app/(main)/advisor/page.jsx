@@ -88,6 +88,8 @@ export default function AICareerAdvisorPage() {
               content: `System update: I have successfully chunked and embedded "${file.name}" into your semantic memory profile. You can now reference this document in your questions!`
             }
           ]);
+        } else {
+          toast.error(res.error || "Failed to embed document.");
         }
       } catch (error) {
         console.error(error);
@@ -110,6 +112,8 @@ export default function AICareerAdvisorPage() {
             content: "Semantic memory cleared. I no longer have access to your previous custom documents, but I'm still here to offer general career coaching!"
           }
         ]);
+      } else {
+        toast.error(res.error || "Failed to clear documents.");
       }
     } catch (error) {
       console.error(error);
@@ -138,6 +142,8 @@ export default function AICareerAdvisorPage() {
           ...prev,
           { role: "assistant", content: res.responseText }
         ]);
+      } else {
+        toast.error(res.error || "Failed to send message.");
       }
     } catch (error) {
       console.error(error);
