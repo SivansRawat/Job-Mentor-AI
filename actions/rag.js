@@ -8,7 +8,7 @@ import crypto from "crypto";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
 // Helper to chunk text on word boundaries
 function chunkText(text, size = 800, overlap = 150) {
@@ -69,7 +69,10 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
 
     // 3. Loop and embed chunks in parallel or batches
     for (const chunk of chunks) {
-      const embedResult = await embeddingModel.embedContent(chunk);
+      const embedResult = await embeddingModel.embedContent({
+        content: { parts: [{ text: chunk }] },
+        outputDimensionality: 768
+      });
       const vector = embedResult.embedding.values;
       const vectorString = `[${vector.join(",")}]`;
       const chunkId = crypto.randomUUID();
@@ -77,7 +80,7 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
       // Insert vector row into Neon pgvector column using raw SQL
       await db.$executeRawUnsafe(`
         INSERT INTO "DocumentChunk" (id, "userId", content, metadata, embedding, "createdAt")
-        VALUES ($1, $2, $3, $4, $5::vector, NOW())
+        VALUES ($1, $2, $3, $4::jsonb, $5::vector, NOW())
       `, chunkId, user.id, chunk, JSON.stringify({ fileName }));
     }
 
@@ -122,7 +125,10 @@ export async function chatAdvisor(userMessage, chatHistory = []) {
 
   try {
     // 1. Generate vector embedding for the user message
-    const embedResult = await embeddingModel.embedContent(userMessage);
+    const embedResult = await embeddingModel.embedContent({
+      content: { parts: [{ text: userMessage }] },
+      outputDimensionality: 768
+    });
     const queryVector = embedResult.embedding.values;
     const queryVectorString = `[${queryVector.join(",")}]`;
 
