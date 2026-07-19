@@ -138,7 +138,10 @@ export async function chatAdvisor(userMessage, chatHistory = []) {
 
     // 3. Extract matching text fragments to feed as context
     const context = matches && matches.length > 0 
-      ? matches.map((m) => `[Source: ${JSON.parse(m.metadata).fileName}]\n${m.content}`).join("\n\n")
+      ? matches.map((m) => {
+          const meta = typeof m.metadata === "string" ? JSON.parse(m.metadata) : m.metadata;
+          return `[Source: ${meta?.fileName || "Unknown Document"}]\n${m.content}`;
+        }).join("\n\n")
       : "No matching documents found in user profile.";
 
     // 4. Construct system instruction with contextual documents
