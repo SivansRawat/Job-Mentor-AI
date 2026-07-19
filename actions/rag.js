@@ -3,11 +3,11 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateTextWithFallback } from "@/lib/ai-provider";
 import pdf from "pdf-parse";
 import crypto from "crypto";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
 // Helper to chunk text on word boundaries
@@ -180,12 +180,11 @@ export async function chatAdvisor(userMessage, chatHistory = []) {
       }
     ];
 
-    const result = await model.generateContent({
-      contents,
+    const responseText = await generateTextWithFallback({
+      prompt: userMessage,
       systemInstruction: systemPrompt,
+      contents,
     });
-
-    const responseText = result.response.text();
 
     return {
       success: true,

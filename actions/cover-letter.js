@@ -2,37 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-const model = genAI.getGenerativeModel({ model:"gemini-2.5-flash" });
-
-
-
-// export async function updateCoverLetterOrder(orderedCoverLetters) {
-//   const { userId: clerkUserId } = await auth();
-//   if (!clerkUserId) throw new Error("Unauthorized");
-
-//   const user = await db.user.findUnique({
-//     where: { clerkUserId },
-//   });
-//   if (!user) throw new Error("User not found");
-
-//   console.log("Updating order for user:", user.id);
-//   console.log("Payload:", orderedCoverLetters);
-
-//   const ops = orderedCoverLetters.map(({ id, order }) =>
-//     db.coverLetter.updateMany({
-//       where: { id, userId: user.id }, 
-//       data: { order },
-//     })
-//   );
-
-//   await db.$transaction(ops);
-//   return { success: true };
-// }
-
+import { generateTextWithFallback } from "@/lib/ai-provider";
 
 export async function generateCoverLetter(data) {
   const { userId } = await auth();
@@ -71,8 +41,8 @@ export async function generateCoverLetter(data) {
   `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const content = result.response.text().trim();
+    const rawContent = await generateTextWithFallback({ prompt });
+    const content = rawContent.trim();
 
     const coverLetter = await db.coverLetter.create({
       data: {

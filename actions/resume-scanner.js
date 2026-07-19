@@ -1,11 +1,8 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateTextWithFallback } from "@/lib/ai-provider";
 import pdf from "pdf-parse";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export async function scanResumeATS(base64PDF, jobTitle, jobDescription) {
   try {
@@ -30,7 +27,7 @@ export async function scanResumeATS(base64PDF, jobTitle, jobDescription) {
       return { success: false, error: "We couldn't extract any text from this PDF. Make sure it's not scanned as an image." };
     }
 
-    // 3. Compile prompt for Gemini
+    // 3. Compile prompt for Gemini / Fallback LLM
     const prompt = `
       You are an expert corporate Recruiter and an Applicant Tracking System (ATS) parsing specialist.
       Evaluate the candidate's resume text against the target job requirements:
@@ -55,9 +52,8 @@ export async function scanResumeATS(base64PDF, jobTitle, jobDescription) {
       IMPORTANT: Return ONLY the JSON object. Do not wrap it in markdown block tags (no \`\`\`json). Output a single clean string.
     `;
 
-    // 4. Generate report from Gemini
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    // 4. Generate report using multi-provider fallback engine
+    const text = await generateTextWithFallback({ prompt });
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
     const evaluation = JSON.parse(cleanedText);
