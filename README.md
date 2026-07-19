@@ -79,6 +79,7 @@ Job-Mentor-AI/
 │   ├── cover-letter.js       # Cover letter CRUD & generation actions
 │   ├── dashboard.js          # Industry insights fetching & AI generation
 │   ├── interview.js          # Mock interview quiz generation & assessment saving
+│   ├── rag.js                # RAG context ingestion & advisor chat actions
 │   ├── resume-scanner.js     # Resume ATS parsing & evaluation actions
 │   ├── resume.js             # Resume saving, loading, & AI improvement
 │   ├── speech.js             # Speech coach WebM audio analyzing actions
@@ -86,6 +87,7 @@ Job-Mentor-AI/
 ├── app/                      # Next.js App Router Pages & APIs
 │   ├── (auth)/               # Auth routes (sign-in/sign-up layouts)
 │   ├── (main)/               # Authenticated application modules
+│   │   ├── advisor/          # AI Career Advisor RAG semantic chat route
 │   │   ├── ai-cover-letter/  # Cover letter generator UI & history list
 │   │   ├── dashboard/        # Industry insights dashboard UI
 │   │   ├── interview/        # Quiz/Mock interview UI & dashboard
@@ -109,7 +111,12 @@ Job-Mentor-AI/
 │   └── utils.js              # General helper utilities (Tailwind merger)
 ├── prisma/                   # Database configuration
 │   └── schema.prisma         # Prisma database schema definition
-└── public/                   # Static assets (images, icons)
+├── public/                   # Static assets (images, icons)
+├── middleware.js             # Clerk session authentication protection middleware
+├── next.config.mjs           # Next.js bundler and environment configurations
+├── tailwind.config.mjs       # Tailwind CSS dynamic design style themes configuration
+├── package.json              # Project package scripts and dependencies specifications
+└── components.json           # Shadcn UI library installation presets config
 ```
 
 ---
