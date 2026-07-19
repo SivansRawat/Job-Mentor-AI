@@ -33,11 +33,11 @@ const HeroSection = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleStartJourney = () => {
+  const handleNavigate = (targetPath) => {
     if (isSignedIn) {
-      router.push("/dashboard");
+      router.push(targetPath);
     } else {
-      router.push("/sign-in");
+      router.push(`/sign-in?redirect_url=${encodeURIComponent(targetPath)}`);
     }
   };
 
@@ -71,7 +71,7 @@ const HeroSection = () => {
           <Button
             size="lg"
             className="w-full sm:w-auto px-8 h-12 text-sm font-bold shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-            onClick={handleStartJourney}
+            onClick={() => handleNavigate("/dashboard")}
           >
             Get Started Free <ArrowRight className="h-4 w-4" />
           </Button>
@@ -79,7 +79,7 @@ const HeroSection = () => {
             size="lg"
             variant="outline"
             className="w-full sm:w-auto px-8 h-12 text-sm font-semibold border-primary/30 flex items-center justify-center gap-2 hover:bg-primary/5"
-            onClick={() => router.push("/resume")}
+            onClick={() => handleNavigate("/resume")}
           >
             <Sparkles className="h-4 w-4 text-primary" /> Explore ATS Resume Tailor
           </Button>

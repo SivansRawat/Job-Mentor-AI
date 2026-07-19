@@ -39,11 +39,11 @@ export default function LandingPage() {
   const router = useRouter();
   const [spotlightTab, setSpotlightTab] = useState("tailor");
 
-  const handleStartJourney = () => {
+  const handleNavigate = (targetPath) => {
     if (isSignedIn) {
-      router.push("/dashboard");
+      router.push(targetPath);
     } else {
-      router.push("/sign-in");
+      router.push(`/sign-in?redirect_url=${encodeURIComponent(targetPath)}`);
     }
   };
 
@@ -116,7 +116,7 @@ export default function LandingPage() {
                         Instantly load tailored markdown into your active builder.
                       </p>
                     </div>
-                    <Button size="sm" className="mt-2 text-xs" onClick={() => router.push("/resume")}>
+                    <Button size="sm" className="mt-2 text-xs" onClick={() => handleNavigate("/resume")}>
                       Try ATS Tailor <ArrowRight className="h-3.5 w-3.5 ml-1" />
                     </Button>
                   </div>
@@ -155,7 +155,7 @@ export default function LandingPage() {
                         Direct audio transcription & targeted knowledge gap feedback.
                       </p>
                     </div>
-                    <Button size="sm" className="mt-2 text-xs" onClick={() => router.push("/interview/speech")}>
+                    <Button size="sm" className="mt-2 text-xs" onClick={() => handleNavigate("/interview/speech")}>
                       Start Voice Practice <ArrowRight className="h-3.5 w-3.5 ml-1" />
                     </Button>
                   </div>
@@ -194,7 +194,7 @@ export default function LandingPage() {
                         Answers questions based specifically on your uploaded resume files.
                       </p>
                     </div>
-                    <Button size="sm" className="mt-2 text-xs" onClick={() => router.push("/advisor")}>
+                    <Button size="sm" className="mt-2 text-xs" onClick={() => handleNavigate("/advisor")}>
                       Chat with Advisor <ArrowRight className="h-3.5 w-3.5 ml-1" />
                     </Button>
                   </div>
@@ -233,7 +233,7 @@ export default function LandingPage() {
                         Step-by-step career progression milestones for role mastery.
                       </p>
                     </div>
-                    <Button size="sm" className="mt-2 text-xs" onClick={() => router.push("/dashboard")}>
+                    <Button size="sm" className="mt-2 text-xs" onClick={() => handleNavigate("/dashboard")}>
                       Explore Dashboard <ArrowRight className="h-3.5 w-3.5 ml-1" />
                     </Button>
                   </div>
@@ -390,7 +390,7 @@ export default function LandingPage() {
             size="lg"
             variant="secondary"
             className="mt-4 font-bold px-8 h-12 shadow-lg"
-            onClick={handleStartJourney}
+            onClick={() => handleNavigate("/dashboard")}
           >
             Start Your Free Career Journey <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
