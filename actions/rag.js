@@ -3,7 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import * as pdf from "pdf-parse";
+import pdf from "pdf-parse";
 import crypto from "crypto";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

@@ -69,10 +69,10 @@ export default function AICareerAdvisorPage() {
     }
 
     setUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = async () => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = async () => {
+      try {
         const base64File = reader.result.split(",")[1];
         const res = await uploadAndEmbedDocument(base64File, file.name, file.type);
         if (res.success) {
@@ -88,13 +88,13 @@ export default function AICareerAdvisorPage() {
             }
           ]);
         }
-      };
-    } catch (error) {
-      console.error(error);
-      toast.error(error.message || "Failed to embed document.");
-    } finally {
-      setUploading(false);
-    }
+      } catch (error) {
+        console.error(error);
+        toast.error(error.message || "Failed to embed document.");
+      } finally {
+        setUploading(false);
+      }
+    };
   };
 
   const handleClearDocuments = async () => {
