@@ -27,6 +27,7 @@ import { saveResume } from "@/actions/resume";
 import { generateAISummary, suggestAISkills } from "@/actions/resume-generator";
 import { EntryForm } from "./entry-form";
 import { ResumePreview } from "./resume-preview";
+import { ResumeTailor } from "./resume-tailor";
 import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
 import { entriesToMarkdown } from "@/app/lib/helper";
@@ -206,6 +207,12 @@ export default function ResumeBuilder({ initialContent }) {
     }
   };
 
+  const handleImportTailoredMarkdown = (markdown) => {
+    setPreviewContent(markdown);
+    setActiveTab("preview");
+    toast.success("Tailored resume imported into your builder! Click 'Save Resume' to keep changes.");
+  };
+
   return (
     <div data-color-mode="light" className="space-y-6">
       {/* Top Header Controls */}
@@ -265,9 +272,10 @@ export default function ResumeBuilder({ initialContent }) {
 
       {/* Main Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full max-w-xl">
+        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
           <TabsTrigger value="edit">Form Editor</TabsTrigger>
           <TabsTrigger value="styled-preview">Styled Preview</TabsTrigger>
+          <TabsTrigger value="tailor">Smart Tailor</TabsTrigger>
           <TabsTrigger value="preview">Markdown</TabsTrigger>
           <TabsTrigger value="ats">ATS Audit</TabsTrigger>
         </TabsList>
@@ -420,6 +428,11 @@ export default function ResumeBuilder({ initialContent }) {
         {/* Tab 2: Live Styled Resume Preview */}
         <TabsContent value="styled-preview">
           <ResumePreview formValues={formValues} user={user} />
+        </TabsContent>
+
+        {/* Tab 3: Smart Tailor */}
+        <TabsContent value="tailor">
+          <ResumeTailor onImportMarkdown={handleImportTailoredMarkdown} />
         </TabsContent>
 
         {/* Tab 3: Markdown View */}
