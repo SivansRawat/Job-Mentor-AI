@@ -2,23 +2,23 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import * as pdf from "pdf-parse";
+import pdf from "pdf-parse";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export async function scanResumeATS(base64PDF, jobTitle, jobDescription) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  if (!base64PDF) {
-    throw new Error("No resume file uploaded.");
-  }
-  if (!jobDescription) {
-    throw new Error("Please provide a target job description to match against.");
-  }
-
   try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    if (!base64PDF) {
+      return { success: false, error: "No resume file uploaded." };
+    }
+    if (!jobDescription) {
+      return { success: false, error: "Please provide a target job description to match against." };
+    }
+
     // 1. Decode base64 PDF into a binary buffer
     const buffer = Buffer.from(base64PDF, "base64");
 
@@ -27,7 +27,7 @@ export async function scanResumeATS(base64PDF, jobTitle, jobDescription) {
     const resumeText = parsedData.text || "";
 
     if (!resumeText.trim()) {
-      throw new Error("We couldn't extract any text from this PDF. Make sure it's not scanned as an image.");
+      return { success: false, error: "We couldn't extract any text from this PDF. Make sure it's not scanned as an image." };
     }
 
     // 3. Compile prompt for Gemini
@@ -68,6 +68,6 @@ export async function scanResumeATS(base64PDF, jobTitle, jobDescription) {
     };
   } catch (error) {
     console.error("ATS scanner server action error:", error);
-    throw new Error(error.message || "Failed to analyze resume. Please try a different PDF formatting.");
+    return { success: false, error: error.message || "Failed to analyze resume. Please try a different PDF formatting." };
   }
 }

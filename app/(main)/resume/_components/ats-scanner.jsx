@@ -49,24 +49,25 @@ export default function ATSScanner() {
     }
 
     setLoading(true);
-    try {
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = async () => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = async () => {
+      try {
         const base64PDF = reader.result.split(",")[1];
         const res = await scanResumeATS(base64PDF, jobTitle, jobDescription);
         if (res.success) {
           setReport(res.evaluation);
           toast.success("Resume scanned successfully!");
+        } else {
+          toast.error(res.error || "Failed to analyze resume.");
         }
-      };
-    } catch (error) {
-      console.error(error);
-      toast.error(error.message || "Failed to analyze resume.");
-    } finally {
-      setLoading(false);
-    }
+      } catch (error) {
+        console.error(error);
+        toast.error(error.message || "Failed to analyze resume.");
+      } finally {
+        setLoading(false);
+      }
+    };
   };
 
   const copyToClipboard = (text) => {
@@ -288,6 +289,51 @@ export default function ATSScanner() {
                 </div>
               )}
             </CardContent>
+          </Card>
+        ) : loading ? (
+          <Card className="border-2 border-primary/30 bg-primary/5 shadow-2xl h-full min-h-[450px] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+            {/* Animated Laser Scanning Bar */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse" />
+
+            {/* Glowing Sonar Radar Core */}
+            <div className="relative flex items-center justify-center my-6">
+              <div className="absolute -inset-4 rounded-full border-2 border-primary/30 animate-ping opacity-75" />
+              <div className="relative h-20 w-20 rounded-full bg-gradient-to-tr from-primary/20 to-primary/40 border border-primary/50 flex items-center justify-center shadow-lg shadow-primary/20">
+                <Sparkles className="h-10 w-10 text-primary animate-pulse" />
+              </div>
+            </div>
+
+            {/* Dynamic AI Equalizer Wave */}
+            <div className="flex items-center gap-1.5 h-10 my-4">
+              <span className="w-1.5 bg-primary/60 rounded-full h-6 animate-bounce" style={{ animationDuration: "0.8s" }} />
+              <span className="w-1.5 bg-primary/80 rounded-full h-10 animate-bounce" style={{ animationDuration: "1.1s" }} />
+              <span className="w-1.5 bg-primary rounded-full h-8 animate-bounce" style={{ animationDuration: "0.7s" }} />
+              <span className="w-1.5 bg-primary/90 rounded-full h-10 animate-bounce" style={{ animationDuration: "1.0s" }} />
+              <span className="w-1.5 bg-primary/70 rounded-full h-5 animate-bounce" style={{ animationDuration: "0.9s" }} />
+              <span className="w-1.5 bg-primary/50 rounded-full h-7 animate-bounce" style={{ animationDuration: "1.2s" }} />
+            </div>
+
+            <h3 className="font-bold text-lg text-foreground tracking-tight flex items-center gap-2 mt-2">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              AI Neural Scanning in Progress...
+            </h3>
+            
+            <p className="text-xs text-muted-foreground max-w-sm mt-2 leading-relaxed">
+              Extracting PDF structure, calculating vector keyword density, and evaluating your resume against the target position...
+            </p>
+
+            {/* Scanning Phase Badges */}
+            <div className="flex flex-wrap justify-center gap-2 mt-6">
+              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20 animate-pulse">
+                📄 Parsing Layout
+              </span>
+              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20 animate-pulse" style={{ animationDelay: "200ms" }}>
+                🎯 Matching Keywords
+              </span>
+              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20 animate-pulse" style={{ animationDelay: "400ms" }}>
+                ⚡ Writing Recommendations
+              </span>
+            </div>
           </Card>
         ) : (
           <Card className="border-2 border-dashed h-full min-h-[450px] flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
