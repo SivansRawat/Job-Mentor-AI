@@ -81,7 +81,7 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
       await db.$executeRawUnsafe(`
         INSERT INTO "DocumentChunk" (id, "userId", content, metadata, embedding, "createdAt")
         VALUES ($1, $2, $3, $4::jsonb, $5::vector, NOW())
-      `, chunkId, user.id, chunk, JSON.stringify({ fileName }));
+      `, chunkId, user.id, chunk, JSON.stringify({ fileName }), vectorString);
     }
 
     return {
