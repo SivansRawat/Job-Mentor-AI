@@ -33,12 +33,18 @@ model Assessment {
   id            String    @id @default(cuid())
   userId        String
   user          User      @relation(fields: [userId], references: [id])
-  quizScore     Float     // Overall quiz score
-  questions     Json[]    // Array of {question, answer, userAnswer, isCorrect}
-  category      String    // "Technical", "Behavioral", etc.
+  quizScore     Float     // Overall quiz score / response score
+  questions     Json[]    // Array of {question, answer, userAnswer, isCorrect, explanation?}
+  category      String    // "Technical", "Behavioral", "Speech", etc.
   improvementTip String?  // AI-generated improvement tip
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  // Speech assessment fields
+  deliveryScore  Float?
+  fillerWords    Int?
+  speakingSpeed  String?
+  transcript     String?
 
   @@index([userId])
 }

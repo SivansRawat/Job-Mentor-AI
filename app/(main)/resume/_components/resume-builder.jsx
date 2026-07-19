@@ -24,6 +24,7 @@ import { useUser } from "@clerk/nextjs";
 import { entriesToMarkdown } from "@/app/lib/helper";
 import { resumeSchema } from "@/app/lib/schema";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
+import ATSScanner from "./ats-scanner";
 
 export default function ResumeBuilder({ initialContent }) {
   const [activeTab, setActiveTab] = useState("edit");
@@ -216,6 +217,7 @@ export default function ResumeBuilder({ initialContent }) {
         <TabsList>
           <TabsTrigger value="edit">Form</TabsTrigger>
           <TabsTrigger value="preview">Markdown</TabsTrigger>
+          <TabsTrigger value="ats">ATS Scanner</TabsTrigger>
         </TabsList>
 
         <TabsContent value="edit">
@@ -438,6 +440,9 @@ export default function ResumeBuilder({ initialContent }) {
               />
             </div>
           </div>
+        </TabsContent>
+        <TabsContent value="ats">
+          <ATSScanner />
         </TabsContent>
       </Tabs>
     </div>

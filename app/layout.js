@@ -29,8 +29,10 @@ export default function RootLayout({ children }) {
             attribute="class"
             defaultTheme="dark"
             enableSystem
-            disableTransitionOnChange
           >
+            <div className="grid-background"></div>
+            <div className="bg-glow-spot"></div>
+            <div className="bg-glow-spot-2"></div>
             <Header />
             <main className="min-h-screen">{children}</main>
             <Toaster richColors />

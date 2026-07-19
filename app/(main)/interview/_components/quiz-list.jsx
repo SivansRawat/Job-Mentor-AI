@@ -36,9 +36,14 @@ export default function QuizList({ assessments }) {
                 Review your past quiz performance
               </CardDescription>
             </div>
-            <Button onClick={() => router.push("/interview/mock")}>
-              Start New Quiz
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => router.push("/interview/speech")}>
+                🎙️ Speech Coach
+              </Button>
+              <Button onClick={() => router.push("/interview/mock")}>
+                Start New Quiz
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
