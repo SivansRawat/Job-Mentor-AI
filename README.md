@@ -22,10 +22,11 @@ JobMentorAI is a premium, full-stack AI career coach application designed to emp
 - Custom onboarding flow that captures the user's targeted industry, experience level, bio, and technical/interpersonal skills.
 - Synchronizes the onboarding data to auto-generate baseline industry market insights using generative AI.
 
-### 📈 Dynamic Industry Insights Dashboard
-- Delivers real-time data regarding high-demand skills, average growth rates, and general market outlook for the user's industry.
-- Provides dynamic salary charts mapping minimum, median, and maximum salaries across multiple common roles.
-- Curates actionable career recommendations and learning suggestions based on current trends.
+### 📈 Interactive Role & Industry Insights Hub
+- **On-Demand Role Intelligence Search:** Search any custom job title (e.g. *"Full-Stack AI Engineer"*, *"Cloud Architect"*) to generate targeted salary benchmarks, in-demand skills, and trends on demand.
+- **Interactive Skill Action Bridge:** One-click action buttons next to recommended skills to immediately **Add to Resume**, **Practice Interview**, or **Ask AI Advisor**.
+- **Seniority Salary Adjuster:** Dynamically scale salary compensation benchmarks across Junior, Mid-Level, Senior, and Lead/Manager tiers.
+- **AI 30-60-90 Day Career Roadmap:** Step-by-step career progression milestone plan for target role mastery.
 
 ### ⚡ AI Resume Builder & Real-time Strength Meter
 - **AI Summary & Skill Auto-Generation:** One-click "AI Generate Summary" and "AI Suggest Skills" controls tailored to the user's target role.
