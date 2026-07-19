@@ -1,17 +1,17 @@
 # JobMentorAI: Your AI-Powered Career Co-pilot 🚀
 
-JobMentorAI is a premium, full-stack AI career coach application designed to empower job seekers and professionals. Built with **Next.js**, **Prisma**, **Neon PostgreSQL**, **Clerk**, **Inngest**, and **Google Gemini AI**, the platform offers intelligent tools like an AI Resume Builder, an Automated Cover Letter Generator, a Mock Interview Simulator, and a Dynamic Industry Insights Dashboard to help users navigate and excel in the modern job market.
+JobMentorAI is a premium, full-stack AI career coach application designed to empower job seekers and professionals. Built with **Next.js**, **Prisma**, **Neon PostgreSQL**, **Clerk**, **Inngest**, and a **Multi-Provider AI Engine (Gemini, Groq, OpenAI)**, the platform offers intelligent tools like an AI Resume Builder & ATS Tailor, an Automated Cover Letter Generator, a Mock Interview Simulator, and a Dynamic Industry Insights Dashboard to help users navigate and excel in the modern job market.
 
 ---
 
 ## 📋 Table of Contents
 1. [Key Features](#-key-features)
-2. [Tech Stack & Architecture](#-tech-stack--architecture)
-3. [Folder Structure](#-folder-structure)
-4. [Database Schema & Models](#-database-schema--models)
-5. [Getting Started (Local Installation)](#-getting-started-local-installation)
-6. [Background Jobs & Automation](#-background-jobs--automation)
-7. [API Endpoints & Server Actions](#-api-endpoints--server-actions)
+2. [Multi-Provider AI Architecture](#-multi-provider-ai-architecture)
+3. [Tech Stack & Architecture](#-tech-stack--architecture)
+4. [Folder Structure](#-folder-structure)
+5. [Database Schema & Models](#-database-schema--models)
+6. [Getting Started (Local Installation)](#-getting-started-local-installation)
+7. [Background Jobs & Automation](#-background-jobs--automation)
 8. [License](#-license)
 
 ---
@@ -27,62 +27,93 @@ JobMentorAI is a premium, full-stack AI career coach application designed to emp
 - Provides dynamic salary charts mapping minimum, median, and maximum salaries across multiple common roles.
 - Curates actionable career recommendations and learning suggestions based on current trends.
 
-### ⚡ AI Resume Builder & ATS Enhancer
-- Write and format professional resumes directly in Markdown inside a dedicated visual editor.
-- Leverage AI-powered critique to rewrite bullet points, highlight action verbs, append quantifiable results, and add industry-relevant keywords.
-- **ATS Compatibility Audit Scanner:** Drag-and-drop a PDF resume, input target job requirements, and run real-time checks highlighting missing keywords, layout caveats, recommendations, and custom bullet rewrites.
-- Single-click PDF generation to download polished, recruiter-ready documents.
+### ⚡ AI Resume Builder & Real-time Strength Meter
+- **AI Summary & Skill Auto-Generation:** One-click "AI Generate Summary" and "AI Suggest Skills" controls tailored to the user's target role.
+- **Resume Strength Meter:** Real-time completion progress bar (0% to 100%) tracking section completion (Contact Info, Summary, Skills, Experience, Education, Projects) with actionable guidance.
+- **Live Styled A4 Resume Preview:** Render elegant, recruiter-ready resume layouts featuring styled contact badges, section headers, and skill chips.
+- Single-click PDF export to download high-resolution resume documents.
+
+### 🎯 Smart AI Resume Tailor & ATS Optimizer (Authentic Optimization)
+- **Target Role Resume Tailoring:** Upload an existing resume PDF, input target Job Title and Job Description, and generate an ATS-optimized version tailored specifically for that role.
+- **Strict Integrity Guardrail (No-Lying Rule):** Rephrases bullet points, injects essential keywords, and highlights real accomplishments without fabricating fake jobs, fake dates, or unearned credentials.
+- **ATS Match Score Boost Card:** Shows original vs tailored match compatibility (e.g., 58% ➔ **94% ATS Match**).
+- **Single-Click Import:** Load tailored markdown directly into the active Resume Builder with one click.
+
+### 🔍 ATS Audit Scanner & Futuristic AI Wave Scanner
+- **ATS Compatibility Audit Scanner:** Drag-and-drop a PDF resume, input target job requirements, and run real-time checks highlighting missing keywords, layout caveats, recommendations, and bullet rewrites.
+- **Interactive AI Wave Scanner:** Features a high-tech animated sonar radar core and audio/data wave equalizer with phase indicators (`📄 Parsing Layout`, `🎯 Matching Keywords`, `⚡ Writing Recommendations`).
 
 ### ✍️ Intelligent Cover Letter Generator
 - Instantly generate tailored cover letters by feeding in a target job description, company name, and job title.
-- Tailor the tone and content specifically to your onboarding profile (industry, years of experience, and key skills) so it reads naturally and professionally.
-- Manage and save multiple cover letters as history with options to review, edit, or delete them.
+- Tailor tone and content specifically to your onboarding profile (industry, years of experience, and key skills).
+- Manage and save multiple cover letters with options to review, edit, or delete them.
 
 ### 🗣️ Mock Interview Simulator & Speech Coach
 - Simulates technical interviews by generating 10 multiple-choice questions custom-tailored to the user's industry and key skills.
-- **Multimodal AI Speech Coach:** Practice speaking responses to behavioral and technical prompts out loud. Captures audio level signals, transcribes responses via Gemini, and calculates filler word counts and verbal pacing rates.
-- Evaluates answers in real-time, delivering scores, detailed explanations, and specific AI-driven improvement tips highlighting knowledge gaps.
-- Saves progress as performance records (assessments) to track career readiness over time.
+- **Multimodal AI Speech Coach:** Practice speaking responses out loud with cross-browser audio recording support (`audio/webm`, `audio/mp4`, `audio/ogg`). Transcribes spoken answers via Gemini and calculates filler word counts and verbal pacing rates.
+- Evaluates answers in real-time, delivering scores, detailed explanations, and specific AI-driven improvement tips.
 
 ### 💬 AI Career Advisor (RAG & Semantic Search)
-- Upload career documents (resumes, certifications, cover letters, or job descriptions) to embed them into your personalized profile.
+- Upload career documents (resumes, certifications, cover letters, or job descriptions) to embed them into your vector profile.
 - Conversational chat assistant utilizing **Retrieval-Augmented Generation (RAG)** to index and answer document-specific user questions.
-- Grounded responses using Google's `text-embedding-004` and `gemini-2.5-flash` to query Neon PostgreSQL `vector` datasets.
+- Grounded responses using `gemini-embedding-001` (768-dimensional vectors) and `gemini-2.5-flash` querying Neon PostgreSQL `pgvector` datasets.
+
+---
+
+## 🤖 Multi-Provider AI Architecture
+
+JobMentorAI features a resilient, multi-provider LLM cascade runner (`lib/ai-provider.js`) that prevents service outages due to API rate limits (HTTP 429) or provider quota caps:
+
+```
+[User Request] ➔ 1. Google Gemini (gemini-2.5-flash)
+                    │ (If Rate Limited / HTTP 429)
+                    ▼
+                 2. Groq API (llama-3.3-70b-versatile)
+                    │ (If Quota Exceeded / Error)
+                    ▼
+                 3. OpenAI API (gpt-4o-mini)
+```
+
+- **Zero Bundle Bloat:** Uses native HTTP `fetch` for Groq and OpenAI REST endpoints to keep client and serverless bundle sizes minimal.
+- **Automatic Fallback:** Seamlessly shifts traffic to secondary providers without interrupting the user experience.
 
 ---
 
 ## 🏗️ Tech Stack & Architecture
 
 ### Core Frontend
-* **Framework:** [Next.js 15 (App Router)](https://nextjs.org/) — Utilizing React server components and server-side rendering for speed and SEO optimization.
-* **Styling:** [Tailwind CSS](https://tailwindcss.com/) — A utility-first CSS framework coupled with CSS variables for dynamic variables.
-* **Component Library:** [Shadcn UI](https://ui.shadcn.com/) — High-quality, highly accessible primitive UI elements built on top of Radix UI.
+* **Framework:** [Next.js 15 (App Router)](https://nextjs.org/) — Utilizing React server components and server-side rendering.
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework coupled with CSS variables for dynamic themes.
+* **Component Library:** [Shadcn UI](https://ui.shadcn.com/) — Primitive UI elements built on top of Radix UI.
+* **Markdown Rendering:** [React Markdown](https://github.com/remarkjs/react-markdown) & `@uiw/react-md-editor` — Renders formatted AI responses and live resume previews.
 * **Theme Management:** [Next Themes](https://github.com/pacocoursey/next-themes) — Supports dynamic dark/light mode toggles.
-* **Data Visualization:** [Recharts](https://recharts.org/) — Implements interactive data charts to visualize salary ranges.
+* **Data Visualization:** [Recharts](https://recharts.org/) — Interactive data charts visualizing salary ranges.
 
 ### Core Backend & Services
-* **Database & ORM:** [Neon PostgreSQL](https://neon.tech/) & [Prisma ORM](https://www.prisma.io/) — A serverless, auto-scaling relational database mapped with type-safe client models.
-* **Authentication:** [Clerk](https://clerk.com/) — Secure session management, sign-up/sign-in flows, path protection middleware, and profile imagery.
-* **Background Worker & Cron Scheduling:** [Inngest](https://www.inngest.com/) — Manages background task logic, reliable event queues, and cron triggers (e.g. weekly industry insight calculations) without dedicated daemon processes.
-* **Artificial Intelligence:** [Google Gemini API (gemini-2.5-flash)](https://ai.google.dev/) — Powers resume optimization, cover letter copywriting, and mock interview questions generation.
+* **Database & ORM:** [Neon PostgreSQL](https://neon.tech/) & [Prisma ORM](https://www.prisma.io/) — Serverless PostgreSQL database with `pgvector` vector embeddings extension.
+* **Authentication:** [Clerk](https://clerk.com/) — Secure session management, sign-up/sign-in flows, path protection middleware.
+* **Background Worker & Cron Scheduling:** [Inngest](https://www.inngest.com/) — Manages background tasks and weekly cron triggers without dedicated daemon processes.
+* **Artificial Intelligence Engine:** 
+  - Primary: [Google Gemini API (`gemini-2.5-flash` & `gemini-embedding-001`)](https://ai.google.dev/)
+  - Fallback 1: [Groq API (`llama-3.3-70b-versatile`)](https://groq.com/)
+  - Fallback 2: [OpenAI API (`gpt-4o-mini`)](https://openai.com/)
 
 ---
 
 ## 📁 Folder Structure
 
-The repository is modularly structured, keeping page layouts, database logic, AI server actions, and shared styles strictly segregated:
-
 ```
 Job-Mentor-AI/
-├── .npmrc                    # npm registry configurations (enforces legacy peer deps)
-├── actions/                  # Next.js Server Actions (Database & AI operations)
+├── actions/                  # Next.js Server Actions
 │   ├── cover-letter.js       # Cover letter CRUD & generation actions
 │   ├── dashboard.js          # Industry insights fetching & AI generation
 │   ├── interview.js          # Mock interview quiz generation & assessment saving
 │   ├── rag.js                # RAG context ingestion & advisor chat actions
+│   ├── resume-generator.js   # AI summary & skill suggestion generator
 │   ├── resume-scanner.js     # Resume ATS parsing & evaluation actions
+│   ├── resume-tailor.js      # Authentic ATS resume tailoring action
 │   ├── resume.js             # Resume saving, loading, & AI improvement
-│   ├── speech.js             # Speech coach WebM audio analyzing actions
+│   ├── speech.js             # Speech coach audio analyzing actions
 │   └── user.js               # Onboarding & user profile management
 ├── app/                      # Next.js App Router Pages & APIs
 │   ├── (auth)/               # Auth routes (sign-in/sign-up layouts)
@@ -94,36 +125,35 @@ Job-Mentor-AI/
 │   │   │   └── speech/       # Voice Coach record & analyze layout route
 │   │   ├── onboarding/       # Industry/Skills onboarding flow
 │   │   └── resume/           # Resume builder workspace UI
-│   │       └── _components/  # Resume forms & ATS drag-drop scanner
+│   │       └── _components/  # Resume forms, ATS scanner, & Smart Tailor UI
+│   │           ├── ats-scanner.jsx   # ATS audit scanner & wave equalizer
+│   │           ├── entry-form.jsx    # Work/Education/Project form entries
+│   │           ├── resume-builder.jsx# Main resume editor & strength meter
+│   │           ├── resume-preview.jsx# Live styled A4 resume preview
+│   │           └── resume-tailor.jsx # Smart AI resume tailor component
 ├── app/api/
 │   └── inngest/              # Inngest background event-driven router handler
 ├── components/               # React Components
-│   ├── ui/                   # Shadcn UI reusable components (button, card, dialog, etc.)
-│   ├── header.jsx            # Main app navigation header with Clerk user buttons
-│   ├── hero.jsx              # Landing page hero section
+│   ├── ui/                   # Shadcn UI reusable components
+│   ├── header.jsx            # Main app navigation header
 │   └── theme-provider.jsx    # Dark/light mode theme provider
-├── data/                     # Static FAQ, testimonials, and industry definitions
-├── hooks/                    # Custom React hooks (e.g., useFetch for Server Actions)
 ├── lib/                      # Helper modules and clients
+│   ├── ai-provider.js        # Multi-Provider AI Fallback Engine (Gemini ➔ Groq ➔ OpenAI)
 │   ├── checkUser.js          # Clerk-to-Prisma user synchronization utility
 │   ├── inngest/              # Inngest background worker client and jobs
-│   ├── prisma.js             # Prisma client singleton
-│   └── utils.js              # General helper utilities (Tailwind merger)
+│   └── prisma.js             # Prisma client singleton
 ├── prisma/                   # Database configuration
 │   └── schema.prisma         # Prisma database schema definition
-├── public/                   # Static assets (images, icons)
-├── middleware.js             # Clerk session authentication protection middleware
-├── next.config.mjs           # Next.js bundler and environment configurations
-├── tailwind.config.mjs       # Tailwind CSS dynamic design style themes configuration
-├── package.json              # Project package scripts and dependencies specifications
-└── components.json           # Shadcn UI library installation presets config
+├── vercel.json               # Vercel serverless function configuration (60s maxDuration)
+├── next.config.mjs           # Next.js bundler configuration
+└── package.json              # Project dependencies and scripts
 ```
 
 ---
 
 ## 🗄️ Database Schema & Models
 
-The PostgreSQL database is organized into 6 relational tables using Prisma. Below is the relational structure:
+The PostgreSQL database is organized into 6 relational tables using Prisma:
 
 ```mermaid
 erDiagram
@@ -212,15 +242,16 @@ erDiagram
 
 ## 🛠️ Getting Started (Local Installation)
 
-Follow these steps to get the project up and running locally.
-
 ### 1. Prerequisites
 Ensure you have the following installed on your machine:
 - **Node.js** (v18 or higher recommended)
 - **npm** or **yarn**
-- A **Neon PostgreSQL** database instance (or any PostgreSQL instance)
-- A **Clerk** account for user authentication credentials
-- A **Google Gemini API Key** for generative AI features
+- A **Neon PostgreSQL** database instance with `pgvector` enabled
+- A **Clerk** account for user authentication
+- API Keys:
+  - **Google Gemini API Key** (Primary AI Provider)
+  - **Groq API Key** (Fallback 1 AI Provider - Optional)
+  - **OpenAI API Key** (Fallback 2 AI Provider - Optional)
 
 ### 2. Clone the Repository
 ```bash
@@ -234,39 +265,37 @@ npm install
 ```
 
 ### 4. Configure Environment Variables
-Copy the template `.env.example` into a new file named `.env`:
+Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
-Open `.env` and fill in your corresponding credentials:
+Fill in your credentials:
 ```env
 DATABASE_URL="postgresql://username:password@hostname/dbname?sslmode=require"
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_your_clerk_publishable_key"
 CLERK_SECRET_KEY="sk_your_clerk_secret_key"
 GEMINI_API_KEY="your_google_gemini_api_key"
+GROQ_API_KEY="your_groq_api_key"
+OPENAI_API_KEY="your_openai_api_key"
 RESEND_API_KEY="your_resend_api_key"
 ```
 
 ### 5. Initialize the Database
-Generate the Prisma Client models and push the schema directly to your live database instance:
 ```bash
 npx prisma generate
 npx prisma db push
 ```
 
-### 6. Run Inngest Local Dev Server (Background Jobs)
-Inngest triggers event-driven and cron workflows. To simulate background jobs locally, start the Inngest Dev Server in a separate terminal:
+### 6. Run Inngest Local Dev Server
 ```bash
 npx inngest-cli dev
 ```
-By default, the dev server will run on `http://localhost:8288` and automatically connect to your local Next.js instance endpoint at `http://localhost:3000/api/inngest`.
 
 ### 7. Run the Application
-Start the Next.js local development server:
 ```bash
 npm run dev
 ```
-Open your browser and navigate to **`http://localhost:3000`**.
+Open **`http://localhost:3000`** in your browser.
 
 ---
 
@@ -275,28 +304,11 @@ Open your browser and navigate to **`http://localhost:3000`**.
 JobMentorAI uses **Inngest** to execute automated processes:
 
 1. **Weekly Industry Insights Refresh (`cron: "0 0 * * 0"`)**
-   - Automatically executes every Sunday at midnight.
-   - Fetches every industry current active in the database.
-   - Queries `gemini-2.5-flash` to analyze job market trends, update salary guides, check current in-demand skills, and evaluate industry growth rates.
-   - Saves updated JSON structures back into the `IndustryInsight` database table to keep dashboards live and fresh.
-
+   - Executes every Sunday at midnight.
+   - Fetches active industries, queries the AI engine to update market trends, salary ranges, in-demand skills, and growth rates.
 2. **Weekly Job-Match & Industry Digests (`cron: "0 9 * * 1"`)**
-   - Runs automatically every Monday morning at 9:00 AM.
-   - Gathers list of onboarded user emails and preferred industries.
-   - Compiles weekly market pulse parameters (demand level, growth rate, trending skills, and salary benchmarks) and formats a responsive HTML email message template.
-   - Resolves dispatches using the **Resend API** to email user reports directly.
-
----
-
-## 🤝 Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+   - Runs every Monday morning at 9:00 AM.
+   - Compiles weekly market pulse digests and dispatches email reports to users using the **Resend API**.
 
 ---
 
