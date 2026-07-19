@@ -55,7 +55,20 @@ export default function SpeechPracticePage() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+      
+      // Cross-browser MIME type detection
+      let mimeType = "audio/webm";
+      if (typeof MediaRecorder !== "undefined") {
+        if (MediaRecorder.isTypeSupported("audio/webm")) {
+          mimeType = "audio/webm";
+        } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          mimeType = "audio/mp4";
+        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
+          mimeType = "audio/ogg";
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -64,8 +77,8 @@ export default function SpeechPracticePage() {
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        await uploadAndEvaluate(audioBlob);
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        await uploadAndEvaluate(audioBlob, mimeType);
       };
 
       mediaRecorderRef.current = mediaRecorder;
@@ -87,26 +100,27 @@ export default function SpeechPracticePage() {
     }
   };
 
-  const uploadAndEvaluate = async (audioBlob) => {
+  const uploadAndEvaluate = async (audioBlob, mimeType) => {
     setLoading(true);
-    try {
-      // Convert audio blob to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
-      reader.onloadend = async () => {
+    const reader = new FileReader();
+    reader.readAsDataURL(audioBlob);
+    reader.onloadend = async () => {
+      try {
         const base64Audio = reader.result.split(",")[1];
-        const res = await evaluateSpeechAnswer(base64Audio, currentQuestion);
+        const res = await evaluateSpeechAnswer(base64Audio, currentQuestion, mimeType);
         if (res.success) {
           setEvaluation(res.evaluation);
           toast.success("AI speech evaluation complete!");
+        } else {
+          toast.error(res.error || "Failed to analyze speech response.");
         }
-      };
-    } catch (err) {
-      console.error("Upload error:", err);
-      toast.error(err.message || "Failed to analyze speech.");
-    } finally {
-      setLoading(false);
-    }
+      } catch (err) {
+        console.error("Upload error:", err);
+        toast.error(err.message || "Failed to analyze speech.");
+      } finally {
+        setLoading(false);
+      }
+    };
   };
 
   const formatDuration = (sec) => {
