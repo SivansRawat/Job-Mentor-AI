@@ -67,8 +67,8 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
     // 2. Split document into overlapping chunks
     const chunks = chunkText(rawText, 800, 150);
 
-    // 3. Loop and embed chunks in parallel or batches
-    for (const chunk of chunks) {
+    // 3. Embed and insert chunks in parallel to prevent Vercel 10s timeout
+    const embedPromises = chunks.map(async (chunk) => {
       const embedResult = await embeddingModel.embedContent({
         content: { parts: [{ text: chunk }] },
         outputDimensionality: 768
@@ -82,7 +82,9 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
         INSERT INTO "DocumentChunk" (id, "userId", content, metadata, embedding, "createdAt")
         VALUES ($1, $2, $3, $4::jsonb, $5::vector, NOW())
       `, chunkId, user.id, chunk, JSON.stringify({ fileName }), vectorString);
-    }
+    });
+
+    await Promise.all(embedPromises);
 
     return {
       success: true,
