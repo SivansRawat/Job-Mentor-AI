@@ -30,6 +30,7 @@ JobMentorAI is a premium, full-stack AI career coach application designed to emp
 ### ⚡ AI Resume Builder & ATS Enhancer
 - Write and format professional resumes directly in Markdown inside a dedicated visual editor.
 - Leverage AI-powered critique to rewrite bullet points, highlight action verbs, append quantifiable results, and add industry-relevant keywords.
+- **ATS Compatibility Audit Scanner:** Drag-and-drop a PDF resume, input target job requirements, and run real-time checks highlighting missing keywords, layout caveats, recommendations, and custom bullet rewrites.
 - Single-click PDF generation to download polished, recruiter-ready documents.
 
 ### ✍️ Intelligent Cover Letter Generator
@@ -37,8 +38,9 @@ JobMentorAI is a premium, full-stack AI career coach application designed to emp
 - Tailor the tone and content specifically to your onboarding profile (industry, years of experience, and key skills) so it reads naturally and professionally.
 - Manage and save multiple cover letters as history with options to review, edit, or delete them.
 
-### 🗣️ Mock Interview Simulator
+### 🗣️ Mock Interview Simulator & Speech Coach
 - Simulates technical interviews by generating 10 multiple-choice questions custom-tailored to the user's industry and key skills.
+- **Multimodal AI Speech Coach:** Practice speaking responses to behavioral and technical prompts out loud. Captures audio level signals, transcribes responses via Gemini, and calculates filler word counts and verbal pacing rates.
 - Evaluates answers in real-time, delivering scores, detailed explanations, and specific AI-driven improvement tips highlighting knowledge gaps.
 - Saves progress as performance records (assessments) to track career readiness over time.
 
@@ -67,11 +69,14 @@ The repository is modularly structured, keeping page layouts, database logic, AI
 
 ```
 Job-Mentor-AI/
+├── .npmrc                    # npm registry configurations (enforces legacy peer deps)
 ├── actions/                  # Next.js Server Actions (Database & AI operations)
 │   ├── cover-letter.js       # Cover letter CRUD & generation actions
 │   ├── dashboard.js          # Industry insights fetching & AI generation
 │   ├── interview.js          # Mock interview quiz generation & assessment saving
+│   ├── resume-scanner.js     # Resume ATS parsing & evaluation actions
 │   ├── resume.js             # Resume saving, loading, & AI improvement
+│   ├── speech.js             # Speech coach WebM audio analyzing actions
 │   └── user.js               # Onboarding & user profile management
 ├── app/                      # Next.js App Router Pages & APIs
 │   ├── (auth)/               # Auth routes (sign-in/sign-up layouts)
@@ -79,12 +84,12 @@ Job-Mentor-AI/
 │   │   ├── ai-cover-letter/  # Cover letter generator UI & history list
 │   │   ├── dashboard/        # Industry insights dashboard UI
 │   │   ├── interview/        # Quiz/Mock interview UI & dashboard
+│   │   │   └── speech/       # Voice Coach record & analyze layout route
 │   │   ├── onboarding/       # Industry/Skills onboarding flow
-│   │   └── resume/           # Resume builder & ATS editor UI
-│   ├── api/
-│   │   └── inngest/          # Inngest API serve endpoint
-│   ├── globals.css           # Global Tailwind and app-wide styles
-│   └── layout.js             # Root application shell & context providers
+│   │   └── resume/           # Resume builder workspace UI
+│   │       └── _components/  # Resume forms & ATS drag-drop scanner
+├── app/api/
+│   └── inngest/              # Inngest background event-driven router handler
 ├── components/               # React Components
 │   ├── ui/                   # Shadcn UI reusable components (button, card, dialog, etc.)
 │   ├── header.jsx            # Main app navigation header with Clerk user buttons
@@ -138,6 +143,10 @@ erDiagram
         String improvementTip
         DateTime createdAt
         DateTime updatedAt
+        Float deliveryScore
+        Int fillerWords
+        String speakingSpeed
+        String transcript
     }
 
     Resume {
@@ -213,6 +222,7 @@ DATABASE_URL="postgresql://username:password@hostname/dbname?sslmode=require"
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_your_clerk_publishable_key"
 CLERK_SECRET_KEY="sk_your_clerk_secret_key"
 GEMINI_API_KEY="your_google_gemini_api_key"
+RESEND_API_KEY="your_resend_api_key"
 ```
 
 ### 5. Initialize the Database
@@ -247,6 +257,12 @@ JobMentorAI uses **Inngest** to execute automated processes:
    - Fetches every industry current active in the database.
    - Queries `gemini-2.5-flash` to analyze job market trends, update salary guides, check current in-demand skills, and evaluate industry growth rates.
    - Saves updated JSON structures back into the `IndustryInsight` database table to keep dashboards live and fresh.
+
+2. **Weekly Job-Match & Industry Digests (`cron: "0 9 * * 1"`)**
+   - Runs automatically every Monday morning at 9:00 AM.
+   - Gathers list of onboarded user emails and preferred industries.
+   - Compiles weekly market pulse parameters (demand level, growth rate, trending skills, and salary benchmarks) and formats a responsive HTML email message template.
+   - Resolves dispatches using the **Resend API** to email user reports directly.
 
 ---
 
