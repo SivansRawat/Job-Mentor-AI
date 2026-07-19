@@ -11,6 +11,7 @@ import {
   FileText, Upload, AlertCircle, Award, User, Bot
 } from "lucide-react";
 import { uploadAndEmbedDocument, clearAllDocuments, chatAdvisor } from "@/actions/rag";
+import ReactMarkdown from "react-markdown";
 
 const SUGGESTIONS = [
   "Based on my resume, what are my biggest skill gaps for high-paying roles?",
@@ -290,7 +291,23 @@ export default function AICareerAdvisorPage() {
                         : "bg-card text-foreground"
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === "model" || msg.role === "assistant" ? (
+                      <ReactMarkdown
+                        components={{
+                          p: ({ node, ...props }) => <p className="mb-3 last:mb-0" {...props} />,
+                          ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                          ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
+                          li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
+                          h3: ({ node, ...props }) => <h3 className="text-base font-bold mb-2 mt-4" {...props} />,
+                          h4: ({ node, ...props }) => <h4 className="text-sm font-bold mb-2 mt-3" {...props} />,
+                          strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </div>
               ))}
