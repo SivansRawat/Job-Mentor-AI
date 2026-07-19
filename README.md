@@ -44,6 +44,11 @@ JobMentorAI is a premium, full-stack AI career coach application designed to emp
 - Evaluates answers in real-time, delivering scores, detailed explanations, and specific AI-driven improvement tips highlighting knowledge gaps.
 - Saves progress as performance records (assessments) to track career readiness over time.
 
+### 💬 AI Career Advisor (RAG & Semantic Search)
+- Upload career documents (resumes, certifications, cover letters, or job descriptions) to embed them into your personalized profile.
+- Conversational chat assistant utilizing **Retrieval-Augmented Generation (RAG)** to index and answer document-specific user questions.
+- Grounded responses using Google's `text-embedding-004` and `gemini-2.5-flash` to query Neon PostgreSQL `vector` datasets.
+
 ---
 
 ## 🏗️ Tech Stack & Architecture
@@ -111,13 +116,14 @@ Job-Mentor-AI/
 
 ## 🗄️ Database Schema & Models
 
-The PostgreSQL database is organized into 5 relational tables using Prisma. Below is the relational structure:
+The PostgreSQL database is organized into 6 relational tables using Prisma. Below is the relational structure:
 
 ```mermaid
 erDiagram
     User ||--|| Resume : "has one"
     User ||--o{ Assessment : "completes many"
     User ||--o{ CoverLetter : "creates many"
+    User ||--o{ DocumentChunk : "embeds many"
     IndustryInsight ||--o{ User : "belongs to"
 
     User {
@@ -183,6 +189,15 @@ erDiagram
         String[] recommendedSkills
         DateTime lastUpdated
         DateTime nextUpdate
+    }
+
+    DocumentChunk {
+        String id PK
+        String userId FK
+        String content
+        Json metadata
+        Vector embedding
+        DateTime createdAt
     }
 ```
 
