@@ -31,7 +31,7 @@ import { ResumeTailor } from "./resume-tailor";
 import { ResumeList } from "./resume-list";
 import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
-import { entriesToMarkdown } from "@/app/lib/helper";
+import { entriesToMarkdown, parseResumeMarkdown } from "@/app/lib/helper";
 import { resumeSchema } from "@/app/lib/schema";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 import ATSScanner from "./ats-scanner";
@@ -51,6 +51,7 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(resumeSchema),
@@ -77,8 +78,12 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
   const formValues = watch();
 
   useEffect(() => {
-    if (initialContent) setActiveTab("preview");
-  }, [initialContent]);
+    if (initialContent) {
+      const parsedData = parseResumeMarkdown(initialContent);
+      reset(parsedData);
+      setPreviewContent(initialContent);
+    }
+  }, [initialContent, reset]);
 
   // Update preview content when form values change
   useEffect(() => {
@@ -442,7 +447,7 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
           <ResumeTailor onImportMarkdown={handleImportTailoredMarkdown} />
         </TabsContent>
 
-        {/* Tab 3: Markdown View */}
+        {/* Tab 4: Markdown View */}
         <TabsContent value="preview">
           {activeTab === "preview" && (
             <Button
@@ -453,11 +458,11 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
             >
               {resumeMode === "preview" ? (
                 <>
-                  <Edit className="h-4 w-4 mr-1" /> Edit Markdown
+                  <Edit className="h-4 w-4 mr-1" /> Edit Raw Markdown
                 </>
               ) : (
                 <>
-                  <Monitor className="h-4 w-4 mr-1" /> Show Preview
+                  <Monitor className="h-4 w-4 mr-1" /> Show Executive Preview
                 </>
               )}
             </Button>
@@ -472,13 +477,13 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
             </div>
           )}
 
-          <div className="border rounded-xl overflow-hidden shadow-sm">
+          <div className="resume-markdown-container max-w-[210mm] mx-auto my-4 shadow-2xl rounded-xl border border-slate-200 bg-white text-slate-900 p-6 md:p-10">
             <MDEditor value={previewContent} onChange={setPreviewContent} height={700} preview={resumeMode} />
           </div>
 
           <div className="hidden">
-            <div id="resume-pdf">
-              <MDEditor.Markdown source={previewContent} style={{ background: "white", color: "black" }} />
+            <div id="resume-pdf" className="resume-markdown-container bg-white text-slate-900 p-8">
+              <MDEditor.Markdown source={previewContent} style={{ background: "white", color: "#0f172a" }} />
             </div>
           </div>
         </TabsContent>
