@@ -20,7 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export function ResumeList({ resume, onSelectEdit }) {
+export function ResumeList({ resume, onSelectEdit, onDownloadPDF }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
@@ -88,11 +88,16 @@ export function ResumeList({ resume, onSelectEdit }) {
             {resume.content || "Empty content..."}
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between items-center border-t bg-muted/20 pt-3">
+        <CardFooter className="flex justify-between items-center border-t bg-muted/20 pt-3 flex-wrap gap-2">
           <div className="flex items-center space-x-2">
             <Button size="sm" onClick={onSelectEdit} className="gap-1.5">
               <Edit3 className="h-4 w-4" /> Edit Resume
             </Button>
+            {onDownloadPDF && (
+              <Button size="sm" variant="outline" onClick={onDownloadPDF} className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10">
+                <Download className="h-4 w-4" /> Download PDF
+              </Button>
+            )}
           </div>
 
           <AlertDialog>

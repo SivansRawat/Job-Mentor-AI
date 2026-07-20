@@ -86,13 +86,37 @@ export function parseResumeMarkdown(markdown) {
   return { contactInfo, summary, skills, experience, education, projects };
 }
 
+function convertToMonthInputFormat(dateStr) {
+  if (!dateStr) return "";
+  const trimmed = dateStr.replace(/[*_]/g, "").trim();
+  if (/^\d{4}-\d{2}$/.test(trimmed)) return trimmed;
+  if (/^\d{4}$/.test(trimmed)) return `${trimmed}-01`;
+
+  const months = {
+    jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+    jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+    january: "01", february: "02", march: "03", april: "04", june: "06",
+    july: "07", august: "08", september: "09", october: "10", november: "11", december: "12"
+  };
+
+  const parts = trimmed.split(/\s+/);
+  if (parts.length === 2) {
+    const m = parts[0].toLowerCase();
+    const y = parts[1];
+    if (months[m] && /^\d{4}$/.test(y)) {
+      return `${y}-${months[m]}`;
+    }
+  }
+  return trimmed;
+}
+
 function parseEntries(bodyText, targetArray, type) {
   if (!bodyText) return;
   const items = bodyText.split(/^###\s+/m).filter(Boolean);
 
   items.forEach((item) => {
     const lines = item.trim().split("\n");
-    const titleHeader = lines[0]?.trim() || "";
+    let titleHeader = lines[0]?.trim() || "";
     let startDate = "";
     let endDate = "";
     let current = false;
@@ -113,6 +137,10 @@ function parseEntries(bodyText, targetArray, type) {
       const parts = title.split(" @ ");
       title = parts[0].trim();
       organization = parts[1]?.trim() || "";
+    } else if (title.includes(" | ")) {
+      const parts = title.split(" | ");
+      title = parts[0].trim();
+      organization = parts[1]?.trim() || "";
     }
 
     if (type === "education" && title.includes(" in ")) {
@@ -123,19 +151,22 @@ function parseEntries(bodyText, targetArray, type) {
 
     const descLines = [];
     lines.slice(1).forEach((line) => {
-      const trimmed = line.trim();
-      const dateMatch = trimmed.match(/([A-Za-z]{3,9}\s*\d{4}|\d{4})\s*[-–—]\s*(Present|[A-Za-z]{3,9}\s*\d{4}|\d{4})/i);
+      const rawLine = line.trim();
+      const cleanedLine = rawLine.replace(/^[*_]+|[*_]+$/g, "").trim();
+
+      const dateMatch = cleanedLine.match(/([A-Za-z]{3,9}\s*\d{4}|\d{4})\s*[-–—]\s*(Present|[A-Za-z]{3,9}\s*\d{4}|\d{4})/i);
       if (dateMatch) {
-        startDate = dateMatch[1];
+        startDate = convertToMonthInputFormat(dateMatch[1]);
         if (dateMatch[2].toLowerCase() === "present") {
           current = true;
+          endDate = "";
         } else {
-          endDate = dateMatch[2];
+          endDate = convertToMonthInputFormat(dateMatch[2]);
         }
-      } else if (trimmed.toLowerCase().startsWith("*tech stack:") || trimmed.toLowerCase().startsWith("tech stack:")) {
-        techStack = trimmed.replace(/\*?tech stack:\s*/i, "").replace(/\*/g, "").trim();
-      } else if (trimmed) {
-        descLines.push(trimmed);
+      } else if (cleanedLine.toLowerCase().startsWith("tech stack:")) {
+        techStack = cleanedLine.replace(/tech stack:\s*/i, "").trim();
+      } else if (rawLine) {
+        descLines.push(rawLine.replace(/^[-*•]\s*/, ""));
       }
     });
 

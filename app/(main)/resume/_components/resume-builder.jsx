@@ -219,6 +219,16 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
     toast.success("Tailored resume imported into your builder! Click 'Save Resume' to keep changes.");
   };
 
+  const handleOpenEditor = () => {
+    const raw = previewContent || initialContent || resumeData?.content;
+    if (raw) {
+      const parsedData = parseResumeMarkdown(raw);
+      reset(parsedData);
+      toast.info("Saved resume fields loaded into form editor!");
+    }
+    setActiveTab("edit");
+  };
+
   return (
     <div data-color-mode="light" className="space-y-6">
       {/* Top Header Controls */}
@@ -289,7 +299,11 @@ export default function ResumeBuilder({ initialContent, resumeData }) {
 
         {/* Tab 0: Saved Resume Dashboard */}
         <TabsContent value="dashboard">
-          <ResumeList resume={resumeData} onSelectEdit={() => setActiveTab("edit")} />
+          <ResumeList
+            resume={resumeData}
+            onSelectEdit={handleOpenEditor}
+            onDownloadPDF={generatePDF}
+          />
         </TabsContent>
 
         {/* Tab 1: Form Editor */}
