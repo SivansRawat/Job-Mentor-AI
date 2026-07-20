@@ -90,3 +90,42 @@ export async function evaluateSpeechAnswer(base64Audio, question, mimeType = "au
     return { success: false, error: error.message || "Failed to analyze speech response." };
   }
 }
+
+export async function generateSpeechQuestions({ category = "Behavioral" } = {}) {
+  try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!user) return { success: false, error: "User not found" };
+
+    const prompt = `
+      You are an executive hiring manager conducting a speech interview for a candidate in the "${user.industry || "Technology"}" industry with ${user.experience || 2} years of experience.
+      Generate 5 highly realistic, challenging ${category} interview questions tailored specifically for this candidate's background.
+
+      Requirements:
+      1. Questions should test ${category} competencies (e.g. STAR method for behavioral, technical design for architecture, leadership for management).
+      2. Return ONLY a JSON array of 5 question strings without markdown code block wrappers (no \`\`\`json).
+      Example: ["Question 1...", "Question 2...", "Question 3...", "Question 4...", "Question 5..."]
+    `;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
+    const questions = JSON.parse(cleanedText);
+
+    return {
+      success: true,
+      questions,
+    };
+  } catch (error) {
+    console.error("Error generating speech questions:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to generate speech questions.",
+      questions: [],
+    };
+  }
+}
