@@ -28,6 +28,7 @@ import { generateAISummary, suggestAISkills } from "@/actions/resume-generator";
 import { EntryForm } from "./entry-form";
 import { ResumePreview } from "./resume-preview";
 import { ResumeTailor } from "./resume-tailor";
+import { ResumeList } from "./resume-list";
 import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
 import { entriesToMarkdown } from "@/app/lib/helper";
@@ -35,8 +36,8 @@ import { resumeSchema } from "@/app/lib/schema";
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 import ATSScanner from "./ats-scanner";
 
-export default function ResumeBuilder({ initialContent }) {
-  const [activeTab, setActiveTab] = useState("edit");
+export default function ResumeBuilder({ initialContent, resumeData }) {
+  const [activeTab, setActiveTab] = useState(resumeData ? "dashboard" : "edit");
   const [previewContent, setPreviewContent] = useState(initialContent);
   const { user } = useUser();
   const [resumeMode, setResumeMode] = useState("preview");
@@ -179,18 +180,18 @@ export default function ResumeBuilder({ initialContent }) {
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
-      // Prefer styled resume template if available, fallback to markdown element
       const element = document.getElementById("styled-resume-pdf") || document.getElementById("resume-pdf");
       const opt = {
-        margin: [10, 10],
-        filename: `${user?.fullName || "resume"}_resume.pdf`,
+        margin: [4, 4, 4, 4],
+        filename: `${user?.fullName?.replace(/\s+/g, "_") || "Resume"}_CV.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
       };
 
       await html2pdf().set(opt).from(element).save();
-      toast.success("PDF downloaded successfully!");
+      toast.success("1-Page PDF exported successfully!");
     } catch (error) {
       console.error("PDF generation error:", error);
       toast.error("Failed to export PDF.");
@@ -272,13 +273,19 @@ export default function ResumeBuilder({ initialContent }) {
 
       {/* Main Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-6 w-full max-w-3xl">
+          <TabsTrigger value="dashboard">Saved Resume</TabsTrigger>
           <TabsTrigger value="edit">Form Editor</TabsTrigger>
           <TabsTrigger value="styled-preview">Styled Preview</TabsTrigger>
           <TabsTrigger value="tailor">Smart Tailor</TabsTrigger>
           <TabsTrigger value="preview">Markdown</TabsTrigger>
           <TabsTrigger value="ats">ATS Audit</TabsTrigger>
         </TabsList>
+
+        {/* Tab 0: Saved Resume Dashboard */}
+        <TabsContent value="dashboard">
+          <ResumeList resume={resumeData} onSelectEdit={() => setActiveTab("edit")} />
+        </TabsContent>
 
         {/* Tab 1: Form Editor */}
         <TabsContent value="edit">

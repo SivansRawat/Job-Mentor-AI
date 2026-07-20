@@ -103,35 +103,10 @@ export const onboardingSchema = z.object({
 
 /* ✅ Updated contactSchema with validation checks */
 export const contactSchema = z.object({
-  email: z
-    .string()
-    .email("Please enter a valid email address")
-    .optional()
-    .or(z.literal("")),
-  mobile: z
-    .string()
-    .regex(
-      /^\+?[0-9]{7,15}$/,
-      "Enter a valid phone number (e.g., +1234567890)"
-    )
-    .optional()
-    .or(z.literal("")),
-  linkedin: z
-    .string()
-    .regex(
-      /^https?:\/\/(www\.)?linkedin\.com\/(in|company)\/[A-Za-z0-9_-]+\/?$/,
-      "Enter a valid LinkedIn URL (e.g., https://linkedin.com/in/username)"
-    )
-    .optional()
-    .or(z.literal("")),
-  twitter: z
-    .string()
-    .regex(
-      /^https?:\/\/(www\.)?(twitter|x)\.com\/[A-Za-z0-9_]+\/?$/,
-      "Enter a valid Twitter or X profile URL (e.g., https://twitter.com/username)"
-    )
-    .optional()
-    .or(z.literal("")),
+  email: z.string().optional().or(z.literal("")),
+  mobile: z.string().optional().or(z.literal("")),
+  linkedin: z.string().optional().or(z.literal("")),
+  twitter: z.string().optional().or(z.literal("")),
 });
 
 export const entrySchema = z
@@ -142,6 +117,10 @@ export const entrySchema = z
     endDate: z.string().optional(),
     description: z.string().min(1, "Description is required"),
     current: z.boolean().default(false),
+    degree: z.string().optional(),
+    fieldOfStudy: z.string().optional(),
+    techStack: z.string().optional(),
+    projectUrl: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -151,7 +130,7 @@ export const entrySchema = z
       return true;
     },
     {
-      message: "End date is required unless this is your current position",
+      message: "End date is required unless current",
       path: ["endDate"],
     }
   );

@@ -92,3 +92,27 @@ export async function improveWithAI({ current, type }) {
     throw new Error("Failed to improve content");
   }
 }
+
+export async function deleteResume() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  try {
+    const deleted = await db.resume.delete({
+      where: {
+        userId: user.id,
+      },
+    });
+    revalidatePath("/resume");
+    return deleted;
+  } catch (error) {
+    console.error("Error deleting resume:", error);
+    throw new Error("Failed to delete resume");
+  }
+}
