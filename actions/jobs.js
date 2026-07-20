@@ -4,34 +4,105 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { generateTextWithFallback } from "@/lib/ai-provider";
 
+function matchKeywords(text, searchTerm) {
+  if (!searchTerm || !text) return true;
+  const cleanTerm = searchTerm.toLowerCase().replace(/[-_/]/g, " ").trim();
+  const cleanText = text.toLowerCase().replace(/[-_/]/g, " ").trim();
+  const tokens = cleanTerm.split(/\s+/).filter((t) => t.length > 2);
+  if (tokens.length === 0) return true;
+  return tokens.some((token) => cleanText.includes(token));
+}
+
+function matchesLocation(jobLocation, filterLocation) {
+  if (!filterLocation || filterLocation === "All") return true;
+  const jobLoc = (jobLocation || "").toLowerCase();
+  const filter = filterLocation.toLowerCase();
+
+  if (filter === "remote") {
+    return (
+      jobLoc.includes("remote") ||
+      jobLoc.includes("worldwide") ||
+      jobLoc.includes("anywhere") ||
+      jobLoc.includes("global") ||
+      jobLoc === ""
+    );
+  }
+  if (filter === "usa" || filter === "us" || filter.includes("america")) {
+    return (
+      jobLoc.includes("us") ||
+      jobLoc.includes("usa") ||
+      jobLoc.includes("united states") ||
+      jobLoc.includes("america") ||
+      jobLoc.includes("remote") ||
+      jobLoc.includes("worldwide")
+    );
+  }
+  if (filter === "europe" || filter === "eu") {
+    return (
+      jobLoc.includes("europe") ||
+      jobLoc.includes("uk") ||
+      jobLoc.includes("united kingdom") ||
+      jobLoc.includes("germany") ||
+      jobLoc.includes("france") ||
+      jobLoc.includes("remote") ||
+      jobLoc.includes("worldwide")
+    );
+  }
+  if (filter === "asia" || filter.includes("india")) {
+    return (
+      jobLoc.includes("asia") ||
+      jobLoc.includes("india") ||
+      jobLoc.includes("singapore") ||
+      jobLoc.includes("japan") ||
+      jobLoc.includes("remote") ||
+      jobLoc.includes("worldwide")
+    );
+  }
+  return (
+    jobLoc.includes(filter) ||
+    jobLoc.includes("remote") ||
+    jobLoc.includes("worldwide")
+  );
+}
+
 async function fetchRealJobsFromAPIs(searchTerm) {
   const realJobs = [];
 
   // 1. Fetch live jobs from Remotive API
   try {
     const query = searchTerm ? encodeURIComponent(searchTerm) : "software";
-    const remotiveUrl = `https://remotive.com/api/remote-jobs?search=${query}&limit=20`;
+    const remotiveUrl = `https://remotive.com/api/remote-jobs?search=${query}&limit=30`;
     const res = await fetch(remotiveUrl, { cache: "no-store" });
     if (res.ok) {
       const data = await res.json();
       if (data.jobs && Array.isArray(data.jobs)) {
         data.jobs.forEach((item, idx) => {
-          realJobs.push({
-            id: `remotive-${item.id || idx}`,
-            title: item.title,
-            company: item.company_name,
-            location: item.candidate_required_location || "Remote",
-            jobType: item.job_type ? item.job_type.replace(/_/g, " ") : "Full-Time",
-            salaryRange: item.salary || "Market Competitive Salary",
-            matchScore: Math.floor(Math.random() * (98 - 86 + 1)) + 86,
-            postedAgo: item.publication_date ? item.publication_date.split("T")[0] : "Recently posted",
-            experienceLevel: "Mid-Senior",
-            requiredSkills: item.tags && item.tags.length > 0 ? item.tags.slice(0, 4) : ["Software", "Remote", "Engineering"],
-            description: item.description ? item.description.replace(/<[^>]+>/g, "").slice(0, 180) + "..." : "Real live job posting.",
-            directApplyUrl: item.url,
-            companyLogo: item.company_logo || null,
-            isLivePosting: true,
-          });
+          const title = item.title || "";
+          const company = item.company_name || "";
+          const category = item.category || "";
+
+          if (
+            matchKeywords(title, searchTerm) ||
+            matchKeywords(company, searchTerm) ||
+            matchKeywords(category, searchTerm)
+          ) {
+            realJobs.push({
+              id: `remotive-${item.id || idx}`,
+              title,
+              company,
+              location: item.candidate_required_location || "Remote",
+              jobType: item.job_type ? item.job_type.replace(/_/g, " ") : "Full-Time",
+              salaryRange: item.salary || "$110k - $160k / yr",
+              matchScore: Math.floor(Math.random() * (98 - 88 + 1)) + 88,
+              postedAgo: item.publication_date ? item.publication_date.split("T")[0] : "Recently posted",
+              experienceLevel: "Mid-Senior",
+              requiredSkills: item.tags && item.tags.length > 0 ? item.tags.slice(0, 4) : ["Tech", "Remote", "Engineering"],
+              description: item.description ? item.description.replace(/<[^>]+>/g, "").slice(0, 180) + "..." : "Real live job posting.",
+              directApplyUrl: item.url,
+              companyLogo: item.company_logo || null,
+              isLivePosting: true,
+            });
+          }
         });
       }
     }
@@ -41,17 +112,22 @@ async function fetchRealJobsFromAPIs(searchTerm) {
 
   // 2. Fetch live jobs from Jobicy API
   try {
-    const jobicyUrl = `https://jobicy.com/api/v2/remote-jobs?count=15`;
+    const jobicyUrl = `https://jobicy.com/api/v2/remote-jobs?count=20`;
     const res = await fetch(jobicyUrl, { cache: "no-store" });
     if (res.ok) {
       const data = await res.json();
       if (data.jobs && Array.isArray(data.jobs)) {
         data.jobs.forEach((item, idx) => {
           const title = item.jobTitle || item.title || "";
-          if (!searchTerm || title.toLowerCase().includes(searchTerm.toLowerCase()) || item.jobCategory?.toLowerCase()?.includes(searchTerm.toLowerCase())) {
+          const category = item.jobCategory || "";
+
+          if (
+            matchKeywords(title, searchTerm) ||
+            matchKeywords(category, searchTerm)
+          ) {
             realJobs.push({
               id: `jobicy-${item.id || idx}`,
-              title: title || "Software Specialist",
+              title: title || "Specialist",
               company: item.companyName || "Hiring Company",
               location: item.jobGeo || "Remote",
               jobType: item.jobType?.[0] || "Full-Time",
@@ -59,7 +135,7 @@ async function fetchRealJobsFromAPIs(searchTerm) {
               matchScore: Math.floor(Math.random() * (98 - 85 + 1)) + 85,
               postedAgo: item.pubDate ? item.pubDate.split(" ")[0] : "Recently posted",
               experienceLevel: item.jobLevel || "Mid-Senior",
-              requiredSkills: [item.jobCategory || "Engineering", "Technology", "Remote"],
+              requiredSkills: [category || "Engineering", "Technology", "Remote"],
               description: item.jobExcerpt ? item.jobExcerpt.replace(/<[^>]+>/g, "").slice(0, 180) + "..." : "Real live job posting.",
               directApplyUrl: item.url,
               companyLogo: item.companyLogo || null,
@@ -76,7 +152,7 @@ async function fetchRealJobsFromAPIs(searchTerm) {
   return realJobs;
 }
 
-export async function getJobPostings({ role = "", location = "Remote", jobType = "All" } = {}) {
+export async function getJobPostings({ role = "", location = "All", jobType = "All" } = {}) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -87,42 +163,48 @@ export async function getJobPostings({ role = "", location = "Remote", jobType =
   if (!user) throw new Error("User not found");
 
   const targetRole = role || user.industry || "Software Engineer";
-  
+
   try {
-    // 1. Fetch REAL live job postings from Remotive & Jobicy APIs
-    let liveJobs = await fetchRealJobsFromAPIs(role || targetRole);
+    // 1. Fetch REAL live job postings matching keywords
+    let liveJobs = await fetchRealJobsFromAPIs(targetRole);
 
-    // Apply location & jobType client filter if specified
-    if (location !== "All" && location !== "Remote") {
-      const locLower = location.toLowerCase();
-      liveJobs = liveJobs.filter(j => j.location.toLowerCase().includes(locLower));
+    // Apply smart location filter
+    if (location && location !== "All") {
+      liveJobs = liveJobs.filter((j) => matchesLocation(j.location, location));
     }
 
-    if (jobType !== "All") {
+    // Apply jobType filter
+    if (jobType && jobType !== "All") {
       const typeLower = jobType.toLowerCase();
-      liveJobs = liveJobs.filter(j => j.jobType.toLowerCase().includes(typeLower));
+      liveJobs = liveJobs.filter((j) => j.jobType.toLowerCase().includes(typeLower));
     }
 
-    // 2. If API results are fewer than 4, fallback to AI generator to ensure rich list
+    // 2. Generate specific AI role listings if live API results are fewer than 4
     if (liveJobs.length < 4) {
-      const userSkills = user.skills?.join(", ") || "JavaScript, React, Node.js";
+      const userSkills = user.skills?.join(", ") || "JavaScript, React, Node.js, Python";
       const prompt = `
-        Generate 6 highly realistic, high-quality job openings for a "${targetRole}" position in the "${user.industry}" industry.
-        Candidate Profile:
-        - Experience Level: ${user.experience || 2} years
-        - Top Skills: ${userSkills}
-        - Location Filter: ${location}
+        Generate 6 highly relevant, real-world job openings for the SPECIFIC search role: "${targetRole}".
+        Candidate Details:
+        - Industry: ${user.industry}
+        - Experience Level: ${user.experience || 3} years
+        - Skills: ${userSkills}
+        - Location: ${location === "All" ? "Remote / Worldwide" : location}
 
-        Return ONLY a valid JSON array of objects without markdown code block wrappers (no \`\`\`json):
+        Requirements:
+        1. Job titles MUST be directly relevant to "${targetRole}" (e.g. Senior ${targetRole}, Lead ${targetRole}, Staff ${targetRole}, Principal ${targetRole}).
+        2. Companies MUST be real tech/industry companies hiring for this role (e.g. Stripe, Vercel, Datadog, OpenAI, Microsoft, Google, AWS, GitHub, Atlassian).
+        3. Match scores should be between 88% and 98%.
+
+        Return ONLY a valid JSON array of objects without markdown wrappers (no \`\`\`json):
         [
           {
             "id": "job-ai-1",
-            "title": "string (Job Title)",
-            "company": "string (Real Hiring Company Name e.g. Stripe, Vercel, Datadog)",
-            "location": "string (e.g. Remote, San Francisco CA)",
+            "title": "string (Targeted Job Title matching ${targetRole})",
+            "company": "string (Real Hiring Company Name)",
+            "location": "string (e.g. ${location === "All" ? "Remote" : location})",
             "jobType": "Full-Time" | "Remote" | "Contract",
-            "salaryRange": "string (e.g. $130k - $160k / yr)",
-            "matchScore": number (between 85 and 98),
+            "salaryRange": "string (e.g. $130k - $170k / yr)",
+            "matchScore": number (between 88 and 98),
             "postedAgo": "string (e.g. 1 day ago)",
             "experienceLevel": "string (e.g. Mid-Senior)",
             "requiredSkills": ["skill1", "skill2", "skill3"],
@@ -138,11 +220,16 @@ export async function getJobPostings({ role = "", location = "Remote", jobType =
         const aiPostings = JSON.parse(cleanedText);
         liveJobs = [...liveJobs, ...aiPostings];
       } catch (err) {
-        console.error("AI fallback error:", err);
+        console.error("AI targeted role generation error:", err);
       }
     }
 
-    // Attach platform-specific apply links to every posting
+    // Filter final result set again by location & type
+    if (location && location !== "All") {
+      liveJobs = liveJobs.filter((j) => matchesLocation(j.location, location));
+    }
+
+    // Attach direct application links and search shortcuts
     const formattedPostings = liveJobs.slice(0, 12).map((job, idx) => {
       const qTitleCompany = encodeURIComponent(`${job.title} ${job.company}`);
       const qTitle = encodeURIComponent(job.title);

@@ -35,19 +35,18 @@ export default function JobList({ initialPostings = [], initialRole = "" }) {
   const [typeFilter, setTypeFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = async (e) => {
-    if (e) e.preventDefault();
+  const fetchPostingsWith = async (targetRole, loc, type) => {
     setIsLoading(true);
     try {
       const res = await getJobPostings({
-        role: searchRole,
-        location: locationFilter,
-        jobType: typeFilter,
+        role: targetRole,
+        location: loc,
+        jobType: type,
       });
 
       if (res.success) {
         setPostings(res.postings);
-        toast.success(`Found ${res.postings.length} live job openings!`);
+        toast.success(`Found ${res.postings.length} matching job openings!`);
       } else {
         toast.error(res.error || "Failed to search jobs.");
       }
@@ -56,6 +55,21 @@ export default function JobList({ initialPostings = [], initialRole = "" }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    fetchPostingsWith(searchRole, locationFilter, typeFilter);
+  };
+
+  const handleLocationChange = (loc) => {
+    setLocationFilter(loc);
+    fetchPostingsWith(searchRole, loc, typeFilter);
+  };
+
+  const handleTypeChange = (type) => {
+    setTypeFilter(type);
+    fetchPostingsWith(searchRole, locationFilter, type);
   };
 
   return (
@@ -90,7 +104,7 @@ export default function JobList({ initialPostings = [], initialRole = "" }) {
                 type="button"
                 variant={locationFilter === loc ? "default" : "outline"}
                 size="sm"
-                onClick={() => setLocationFilter(loc)}
+                onClick={() => handleLocationChange(loc)}
                 className="h-7 text-xs rounded-full"
               >
                 {loc}
@@ -105,7 +119,7 @@ export default function JobList({ initialPostings = [], initialRole = "" }) {
                 type="button"
                 variant={typeFilter === t ? "secondary" : "ghost"}
                 size="sm"
-                onClick={() => setTypeFilter(t)}
+                onClick={() => handleTypeChange(t)}
                 className="h-7 text-xs"
               >
                 {t}
