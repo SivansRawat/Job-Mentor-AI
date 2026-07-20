@@ -485,6 +485,24 @@ const DashboardView = ({ insights: initialInsights }) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Active Job Openings Banner */}
+      <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-background to-primary/5 shadow-md">
+        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="space-y-1 text-center md:text-left">
+            <h3 className="text-xl font-bold flex items-center gap-2 justify-center md:justify-start">
+              <BriefcaseIcon className="h-5 w-5 text-primary" /> Active Job Openings & Direct Apply
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Ready to apply? Explore AI-matched job openings for <span className="font-semibold text-foreground">"{customRole || currentInsights?.industry || "your target role"}"</span> across LinkedIn, Indeed, Wellfound, Google Jobs, and Glassdoor.
+            </p>
+          </div>
+          <Button onClick={() => router.push(`/jobs?role=${encodeURIComponent(customRole || "")}`)} className="gap-2 shrink-0">
+            <span>Explore Openings</span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

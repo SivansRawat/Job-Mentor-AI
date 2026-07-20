@@ -8,6 +8,7 @@ import {
   ChevronDown,
   StarsIcon,
   MessageSquare,
+  Briefcase,
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -88,6 +89,12 @@ export default async function Header() {
                   <Link href="/advisor" className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
                     AI Career Advisor
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/jobs" className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-primary" />
+                    Job Openings
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
