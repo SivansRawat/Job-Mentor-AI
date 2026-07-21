@@ -69,11 +69,8 @@ export async function uploadAndEmbedDocument(base64File, fileName, fileType) {
 
     // 3. Embed and insert chunks in parallel to prevent Vercel 10s timeout
     const embedPromises = chunks.map(async (chunk) => {
-      const embedResult = await embeddingModel.embedContent({
-        content: { parts: [{ text: chunk }] },
-        outputDimensionality: 768
-      });
-      const vector = embedResult.embedding.values;
+      const embedResult = await embeddingModel.embedContent(chunk);
+      const vector = embedResult.embedding.values.slice(0, 768);
       const vectorString = `[${vector.join(",")}]`;
       const chunkId = crypto.randomUUID();
 
@@ -127,11 +124,8 @@ export async function chatAdvisor(userMessage, chatHistory = []) {
     if (!user) return { success: false, error: "User not found" };
 
     // 1. Generate vector embedding for the user message
-    const embedResult = await embeddingModel.embedContent({
-      content: { parts: [{ text: userMessage }] },
-      outputDimensionality: 768
-    });
-    const queryVector = embedResult.embedding.values;
+    const embedResult = await embeddingModel.embedContent(userMessage);
+    const queryVector = embedResult.embedding.values.slice(0, 768);
     const queryVectorString = `[${queryVector.join(",")}]`;
 
     // 2. Perform Cosine Similarity vector search on PostgreSQL pgvector column
