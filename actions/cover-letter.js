@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { generateTextWithFallback } from "@/lib/ai-provider";
+import { retrieveUserVectorChunks, formatChunksForPrompt } from "@/lib/rag-helper";
 
 export async function generateCoverLetter(data) {
   const { userId } = await auth();
@@ -14,30 +15,28 @@ export async function generateCoverLetter(data) {
 
   if (!user) throw new Error("User not found");
 
+  // RAG Vector Retrieval: Fetch candidate's top matching document chunks
+  const vectorChunks = await retrieveUserVectorChunks(user.id, data.jobDescription, 4);
+  const ragContext = formatChunksForPrompt(vectorChunks);
+
   const prompt = `
-    Write a professional cover letter for a ${data.jobTitle} position at ${
-    data.companyName
-  }.
+    Write a professional cover letter for a ${data.jobTitle} position at ${data.companyName}.
     
     About the candidate:
     - Industry: ${user.industry}
     - Years of Experience: ${user.experience}
     - Skills: ${user.skills?.join(", ")}
-    - Professional Background: ${user.bio}
+    - Bio: ${user.bio}
+    ${ragContext}
     
     Job Description:
     ${data.jobDescription}
     
     Requirements:
     1. Use a professional, enthusiastic tone
-    2. Highlight relevant skills and experience
-    3. Show understanding of the company's needs
-    4. Keep it concise (max 400 words)
-    5. Use proper business letter formatting in markdown
-    6. Include specific examples of achievements
-    7. Relate candidate's background to job requirements
-    
-    Format the letter in markdown.
+    2. Incorporate specific real accomplishments & projects retrieved from candidate's vector profile above
+    3. Relate candidate's background directly to job requirements
+    4. Keep it concise (max 400 words) in markdown format
   `;
 
   try {

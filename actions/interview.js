@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { generateTextWithFallback } from "@/lib/ai-provider";
+import { retrieveUserVectorChunks, formatChunksForPrompt } from "@/lib/rag-helper";
 
 export async function generateQuiz() {
   const { userId } = await auth();
@@ -11,6 +12,7 @@ export async function generateQuiz() {
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
     select: {
+      id: true,
       industry: true,
       skills: true,
     },
@@ -18,12 +20,17 @@ export async function generateQuiz() {
 
   if (!user) throw new Error("User not found");
 
+  // RAG Vector Retrieval: Fetch candidate's matching vector chunks from Neon PostgreSQL
+  const vectorChunks = await retrieveUserVectorChunks(user.id, `${user.industry} ${user.skills?.join(" ")}`, 4);
+  const ragContext = formatChunksForPrompt(vectorChunks);
+
   const prompt = `
     Generate 10 technical interview questions for a ${
       user.industry
     } professional${
     user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
   }.
+    ${ragContext}
     
     Each question should be multiple choice with 4 options.
     
