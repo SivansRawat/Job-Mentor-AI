@@ -19,8 +19,9 @@ export async function generateAISummary({ role, industry }) {
 
     // RAG Vector Retrieval: Fetch candidate's top matching document chunks
     let ragContext = "";
+    let vectorChunks = [];
     if (user) {
-      const vectorChunks = await retrieveUserVectorChunks(user.id, `${targetRole} ${targetIndustry}`, 4);
+      vectorChunks = await retrieveUserVectorChunks(user.id, `${targetRole} ${targetIndustry}`, 4);
       ragContext = formatChunksForPrompt(vectorChunks);
     }
 
@@ -41,6 +42,8 @@ export async function generateAISummary({ role, industry }) {
     return {
       success: true,
       summary: summary.trim().replace(/^["']|["']$/g, ""),
+      ragUsed: vectorChunks.length > 0,
+      ragChunkCount: vectorChunks.length,
     };
   } catch (error) {
     console.error("AI summary generation error:", error);
@@ -62,8 +65,9 @@ export async function suggestAISkills({ role, industry }) {
 
     // RAG Vector Retrieval
     let ragContext = "";
+    let vectorChunks = [];
     if (user) {
-      const vectorChunks = await retrieveUserVectorChunks(user.id, `${targetRole} ${targetIndustry}`, 4);
+      vectorChunks = await retrieveUserVectorChunks(user.id, `${targetRole} ${targetIndustry}`, 4);
       ragContext = formatChunksForPrompt(vectorChunks);
     }
 
@@ -79,6 +83,8 @@ export async function suggestAISkills({ role, industry }) {
     return {
       success: true,
       skills: skillsText.trim().replace(/^["']|["']$/g, ""),
+      ragUsed: vectorChunks.length > 0,
+      ragChunkCount: vectorChunks.length,
     };
   } catch (error) {
     console.error("AI skill suggestion error:", error);

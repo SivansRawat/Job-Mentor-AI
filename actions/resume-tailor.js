@@ -75,6 +75,8 @@ export async function tailorResumeATS(base64PDF, jobTitle, jobDescription) {
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
     const result = JSON.parse(cleanedText);
+    result.ragUsed = (vectorChunks?.length || 0) > 0;
+    result.ragChunkCount = vectorChunks?.length || 0;
 
     return {
       success: true,
