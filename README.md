@@ -251,7 +251,7 @@ erDiagram
         String industry FK
         String bio
         Int experience
-        String[] skills
+        String_Array skills
         DateTime createdAt
         DateTime updatedAt
     }
@@ -260,7 +260,7 @@ erDiagram
         String id PK
         String userId FK
         Float quizScore
-        Json[] questions
+        Json_Array questions
         String category
         String improvementTip
         DateTime createdAt
@@ -273,7 +273,7 @@ erDiagram
 
     Resume {
         String id PK
-        String userId FK UK
+        String userId FK
         String content "Markdown"
         Float atsScore
         String feedback
@@ -296,13 +296,13 @@ erDiagram
     IndustryInsight {
         String id PK
         String industry UK
-        Json[] salaryRanges
+        Json_Array salaryRanges
         Float growthRate
         String demandLevel
-        String[] topSkills
+        String_Array topSkills
         String marketOutlook
-        String[] keyTrends
-        String[] recommendedSkills
+        String_Array keyTrends
+        String_Array recommendedSkills
         DateTime lastUpdated
         DateTime nextUpdate
     }
