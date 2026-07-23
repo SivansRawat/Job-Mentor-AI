@@ -3,6 +3,15 @@ import DashboardView from "./_component/dashboard-view";
 import { getUserOnboardingStatus } from "@/actions/user";
 import { redirect } from "next/navigation";
 
+export const metadata = {
+  title: "Career Dashboard",
+  description: "Track your industry insights, salary trends, top skills, and custom 30-60-90 day career progression roadmap.",
+  openGraph: {
+    title: "Career Dashboard | AI Job Mentor",
+    description: "Track your industry insights, salary trends, top skills, and custom 30-60-90 day career progression roadmap.",
+  },
+};
+
 export default async function DashboardPage() {
   const { isOnboarded } = await getUserOnboardingStatus();
 

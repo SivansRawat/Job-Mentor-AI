@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+export const metadata = {
+  title: "404 - Page Not Found",
+  description: "The requested page could not be found on AI Job Mentor.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
+
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[100vh] px-4 text-center">

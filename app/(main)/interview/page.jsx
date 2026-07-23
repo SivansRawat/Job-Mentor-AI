@@ -3,6 +3,16 @@ import StatsCards from "./_components/stats-cards";
 import PerformanceChart from "./_components/performace-chart";
 import QuizList from "./_components/quiz-list";
 
+export const metadata = {
+  title: "AI Interview Preparation",
+  description: "Prepare for job interviews with custom quizzes, performance tracking, stats, and real-time AI feedback.",
+  keywords: ["Interview Prep", "AI Interview Practice", "Mock Interview AI", "Interview Performance"],
+  openGraph: {
+    title: "AI Interview Preparation | AI Job Mentor",
+    description: "Prepare for job interviews with custom quizzes, performance tracking, stats, and real-time AI feedback.",
+  },
+};
+
 export default async function InterviewPrepPage() {
   const assessments = await getAssessments();
 

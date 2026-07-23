@@ -3,6 +3,15 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterGenerator from "../_components/cover-letter-generator";
 
+export const metadata = {
+  title: "Create Cover Letter",
+  description: "Generate a customized cover letter for your job applications using AI experience analysis.",
+  openGraph: {
+    title: "Create Cover Letter | AI Job Mentor",
+    description: "Generate a customized cover letter for your job applications using AI experience analysis.",
+  },
+};
+
 export default function NewCoverLetterPage() {
   return (
     <div className="container mx-auto py-6">

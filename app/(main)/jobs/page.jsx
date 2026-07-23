@@ -2,8 +2,18 @@ import { getJobPostings } from "@/actions/jobs";
 import JobList from "./_components/job-list";
 
 export const metadata = {
-  title: "Job Openings | AI Job Mentor",
+  title: "Job Openings & Direct Apply",
   description: "Explore AI-matched job openings across LinkedIn, Indeed, Wellfound, Google Jobs, Glassdoor, and RemoteOK.",
+  keywords: ["AI Job Openings", "Direct Apply Jobs", "Job Search Engine", "LinkedIn Jobs", "RemoteOK Jobs"],
+  openGraph: {
+    title: "Job Openings & Direct Apply | AI Job Mentor",
+    description: "Explore AI-matched job openings across LinkedIn, Indeed, Wellfound, Google Jobs, Glassdoor, and RemoteOK.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Job Openings & Direct Apply | AI Job Mentor",
+    description: "Explore AI-matched job openings across LinkedIn, Indeed, Wellfound, Google Jobs, Glassdoor, and RemoteOK.",
+  },
 };
 
 export default async function JobsPage() {

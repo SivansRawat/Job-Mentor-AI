@@ -4,6 +4,16 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterList from "./_components/cover-letter-list";
 
+export const metadata = {
+  title: "AI Cover Letter Generator",
+  description: "Create highly targeted, professional cover letters tailored to specific job roles and hiring managers.",
+  keywords: ["AI Cover Letter", "Cover Letter Generator", "Job Application Letters"],
+  openGraph: {
+    title: "AI Cover Letter Generator | AI Job Mentor",
+    description: "Create highly targeted, professional cover letters tailored to specific job roles and hiring managers.",
+  },
+};
+
 export default async function CoverLetterPage() {
   const coverLetters = await getCoverLetters();
 
