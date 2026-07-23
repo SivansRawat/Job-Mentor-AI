@@ -6,6 +6,15 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Quiz from "../_components/quiz";
 
+export const metadata = {
+  title: "Mock Technical Interview",
+  description: "Test your skills with AI-generated technical interview quizzes and detailed answer feedback.",
+  openGraph: {
+    title: "Mock Technical Interview | AI Job Mentor",
+    description: "Test your skills with AI-generated technical interview quizzes and detailed answer feedback.",
+  },
+};
+
 export default function MockInterviewPage() {
   return (
     <div className="container mx-auto space-y-4 py-6">

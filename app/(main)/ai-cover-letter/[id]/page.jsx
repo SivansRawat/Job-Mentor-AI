@@ -4,6 +4,24 @@ import { Button } from "@/components/ui/button";
 import { getCoverLetter } from "@/actions/cover-letter";
 import CoverLetterPreview from "../_components/cover-letter-preview";
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const coverLetter = await getCoverLetter(id);
+
+  const title = coverLetter?.jobTitle
+    ? `${coverLetter.jobTitle} at ${coverLetter.companyName || "Company"}`
+    : "Cover Letter Details";
+
+  return {
+    title,
+    description: `Tailored cover letter for ${coverLetter?.jobTitle || "target role"} position at ${coverLetter?.companyName || "company"}.`,
+    openGraph: {
+      title: `${title} | AI Job Mentor`,
+      description: `Tailored cover letter for ${coverLetter?.jobTitle || "target role"} position at ${coverLetter?.companyName || "company"}.`,
+    },
+  };
+}
+
 export default async function EditCoverLetterPage({ params }) {
   const { id } = await params;
   const coverLetter = await getCoverLetter(id);

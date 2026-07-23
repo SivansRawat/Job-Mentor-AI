@@ -8,14 +8,112 @@ import { dark } from "@clerk/themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://job-mentor-ai.vercel.app";
+
 export const metadata = {
-  title: "AI Job Mentor",
-  description: "Your AI-Powered Career Co-pilot & ATS Optimization Platform",
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "AI Job Mentor | AI-Powered Career Co-pilot & ATS Optimizer",
+    template: "%s | AI Job Mentor",
+  },
+  description:
+    "Accelerate your career with AI-powered ATS resume optimization, smart cover letter generation, interactive mock interview preparation, real-time speech coaching, and AI job matching.",
+  keywords: [
+    "AI Career Coach",
+    "ATS Resume Optimizer",
+    "AI Cover Letter Generator",
+    "Mock Interview AI",
+    "Speech Practice AI",
+    "AI Job Advisor",
+    "Job Search Assistant",
+    "Resume Builder",
+    "Career Development",
+  ],
+  authors: [{ name: "AI Job Mentor Team" }],
+  creator: "AI Job Mentor",
+  publisher: "AI Job Mentor",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "AI Job Mentor | AI-Powered Career Co-pilot & ATS Optimizer",
+    description:
+      "Land your dream job with AI-powered resume building, ATS keyword optimization, cover letter generation, voice & quiz mock interviews, and AI job matching.",
+    url: baseUrl,
+    siteName: "AI Job Mentor",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "AI Job Mentor Banner",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Job Mentor | AI-Powered Career Co-pilot & ATS Optimizer",
+    description:
+      "Land your dream job with AI-powered resume building, ATS keyword optimization, cover letter generation, voice & quiz mock interviews, and AI job matching.",
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${baseUrl}/#website`,
+      "url": baseUrl,
+      "name": "AI Job Mentor",
+      "description": "Your AI-Powered Career Co-pilot & ATS Optimization Platform",
+      "publisher": {
+        "@type": "Organization",
+        "name": "AI Job Mentor",
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${baseUrl}/logo.png`
+        }
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${baseUrl}/#application`,
+      "name": "AI Job Mentor",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "description": "Comprehensive AI platform for resume optimization, cover letter creation, mock interviews, and career guidance.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  ]
 };
 
 export default function RootLayout({ children }) {
@@ -30,6 +128,10 @@ export default function RootLayout({ children }) {
           <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
           <link rel="shortcut icon" href="/logo.png" type="image/png" />
           <link rel="apple-touch-icon" href="/logo.png" />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
         </head>
         <body className={`${inter.className}`}>
           <ThemeProvider

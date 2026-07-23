@@ -1,0 +1,23 @@
+export default function manifest() {
+  return {
+    name: "AI Job Mentor",
+    short_name: "Job Mentor AI",
+    description: "Your AI-Powered Career Co-pilot & ATS Optimization Platform",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#090d16",
+    theme_color: "#090d16",
+    icons: [
+      {
+        src: "/logo.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/logo.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  };
+}
