@@ -38,9 +38,12 @@ export const metadata = {
     telephone: false,
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.svg?v=3", type: "image/svg+xml" },
+      { url: "/favicon.ico?v=3", type: "image/x-icon" },
+    ],
+    shortcut: "/favicon.svg?v=3",
+    apple: "/logo.png?v=3",
   },
   alternates: {
     canonical: "/",
@@ -125,9 +128,9 @@ export default function RootLayout({ children }) {
     >
       <html lang="en" suppressHydrationWarning>
         <head>
-          <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
-          <link rel="shortcut icon" href="/logo.png" type="image/png" />
-          <link rel="apple-touch-icon" href="/logo.png" />
+          <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" />
+          <link rel="alternate icon" href="/favicon.ico?v=3" type="image/x-icon" />
+          <link rel="apple-touch-icon" href="/logo.png?v=3" />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

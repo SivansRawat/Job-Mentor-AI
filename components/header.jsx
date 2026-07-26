@@ -18,7 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 import { checkUser } from "@/lib/checkUser";
 
 export default async function Header() {
@@ -27,15 +26,23 @@ export default async function Header() {
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
-          <Image
-            src={"/logo.png"}
-            alt="Job Mentor AI Logo"
-            width={180}
-            height={50}
-            className="h-10 md:h-12 w-auto object-contain"
-            priority
-          />
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0 group">
+          <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-400 via-blue-600 to-blue-700 p-[1.5px] shadow-md shadow-blue-950/60 transition-all duration-200 group-hover:scale-105 group-hover:shadow-blue-500/30 flex items-center justify-center">
+            <div className="w-full h-full rounded-[10px] bg-[#080e1a] flex items-center justify-center relative overflow-hidden">
+              <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-blue-400 to-blue-200 text-base sm:text-lg tracking-tighter">
+                JM
+              </span>
+              <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-white via-sky-100 to-blue-100 bg-clip-text text-transparent">
+              Job Mentor
+            </span>
+            <span className="px-1.5 py-0.5 text-[10px] sm:text-xs font-black rounded-md bg-gradient-to-r from-sky-500 via-blue-600 to-blue-700 text-white shadow-sm uppercase tracking-wider">
+              AI
+            </span>
+          </div>
         </Link>
 
         {/* Action Buttons */}
