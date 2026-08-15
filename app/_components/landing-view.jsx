@@ -23,6 +23,7 @@ import {
   Globe
 } from "lucide-react";
 import HeroSection from "@/components/hero";
+import AnimatedBackground from "@/components/animated-background";
 import {
   Accordion,
   AccordionContent,
@@ -49,7 +50,8 @@ export default function LandingView() {
 
   return (
     <div className="relative space-y-16">
-      <div className="grid-background"></div>
+      {/* Animated WebGL Shader Background */}
+      <AnimatedBackground />
 
       {/* Hero Section */}
       <HeroSection />
@@ -273,30 +275,6 @@ export default function LandingView() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Platform Performance Stats Section */}
-      <section className="w-full py-12 bg-muted/60 border-y">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
-            <div className="space-y-1">
-              <h3 className="text-3xl md:text-4xl font-extrabold text-primary">10+</h3>
-              <p className="text-xs md:text-sm font-medium text-muted-foreground">AI Career Tools</p>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-3xl md:text-4xl font-extrabold text-primary">99.9%</h3>
-              <p className="text-xs md:text-sm font-medium text-muted-foreground">Multi-Provider Uptime</p>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-3xl md:text-4xl font-extrabold text-primary">768-dim</h3>
-              <p className="text-xs md:text-sm font-medium text-muted-foreground">Vector RAG Search</p>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-3xl md:text-4xl font-extrabold text-primary">90%+</h3>
-              <p className="text-xs md:text-sm font-medium text-muted-foreground">ATS Match Boost</p>
-            </div>
           </div>
         </div>
       </section>
