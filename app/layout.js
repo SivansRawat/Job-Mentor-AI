@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
@@ -7,6 +7,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { dark } from "@clerk/themes";
 
 const inter = Inter({ subsets: ["latin"] });
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic", "normal"],
+  variable: "--font-serif",
+});
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://job-mentor-ai.vercel.app";
 
@@ -136,7 +141,7 @@ export default function RootLayout({ children }) {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body className={`${inter.className}`}>
+        <body className={`${inter.className} ${playfair.variable}`}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
